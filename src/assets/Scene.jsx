@@ -10,7 +10,7 @@ Title: Lego Brick
 
 import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
-import scenePath from "./assets/scene-transformed.glb"
+import scenePath from "./scene-transformed.glb"
 
 export function Model(props) {
   const { nodes, materials } = useGLTF(scenePath)
