@@ -7,5 +7,9 @@ export default defineConfig({
   assetsInclude: "**/*.glb",
   preview: {
     port: 8080,
+    build: {
+      sourcemap: true, // Kontrollera om källmappningsfiler ska genereras
+      // Andra bygginställningar...
+    },
   },
 })
