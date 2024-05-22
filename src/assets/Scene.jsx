@@ -9,16 +9,51 @@ Title: Lego Brick
 */
 
 import React, { useRef } from 'react'
-import { useGLTF } from '@react-three/drei'
+import { TransformControls, useGLTF } from '@react-three/drei'
 import scenePath from "./scene-transformed.glb"
+import {useGUI} from "../use_Gui.jsx"
+import { Vector3 } from 'three'
 
 export function Model(props) {
   const { nodes, materials } = useGLTF(scenePath)
+  const groupRef = useRef();
+  // const transformRef = useRef();
+  // const meshRef = useRef();
+/*   useTransform( ()=>
+    {
+      const positionFolderMouse = transformRef.addFolder("position");
+      positionFolderMouse.add(transformRef.current.position,"x", -100, 100);
+      positionFolderMouse.add(transformRef.current.position,"y", -100, 100);
+      positionFolderMouse.add(transformRef.current.position,"z", -100, 100);
+    }) */
+  useGUI((gui) =>{
+    //kontrollera position
+    const positionFolder = gui.addFolder("Position");
+    positionFolder.add(groupRef.current.position,"x",-100,100);
+    positionFolder.add(groupRef.current.position,"y",-100,100);
+    positionFolder.add(groupRef.current.position,"z",-100,100);
+
+    //kontrollera rotation
+    const rotationFolder = gui.addFolder("Rotation");
+    rotationFolder.add(groupRef.current.rotation, "x", 0, Math.PI *2);
+    rotationFolder.add(groupRef.current.rotation, "y", 0, Math.PI *2);
+    rotationFolder.add(groupRef.current.rotation, "z", 0, Math.PI *2);
+  })
+
   return (
-    <group {...props} dispose={null}>
+    <>
+    <group ref={groupRef} {...props} dispose={null}>
       <mesh geometry={nodes.Object_2.geometry} material={materials.LegoBrick1Mtl} rotation={[-Math.PI / 2, 0, 0]} />
     </group>
+    </>
   )
+/*   return (
+    <>
+    <TransformControls ref={transformRef} object={meshRef} mode='translate'>
+      <mesh position={[0,0,0]} ref={meshRef} geometry={nodes.Object_2.geometry} material={materials.LegoBrick1Mtl} rotation={[-Math.PI / 2, 0, 0]} />
+    </TransformControls>
+    </>
+  ) */
 }
 
 useGLTF.preload(scenePath)
