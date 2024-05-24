@@ -20,33 +20,56 @@ export function Model(props) {
   const { nodes, materials } = useGLTF(scenePath);
   const groupRef = useRef();
   const dragControlsRef = useRef();
-  const { camera, gl } = useThree();
-  const [dragSpeed, setDragSpeed] = useState(0.01); // Initial hastighetsfaktor
+  const { camera, gl, mouse } = useThree();
+  //const [dragSpeed, setDragSpeed] = useState(0.01); // Initial hastighetsfaktor
+
+  const mouseVec = new THREE.Vector2();
+  const raycaster = new THREE.Raycaster();
+
+  const plane = new THREE.Plane();
+  const planeNormal = new THREE.Vector3(0, 1, 0);
+  const planeIntersect = new THREE.Vector3();
   useEffect(() => {
     if (groupRef.current) {
       const controls = new DragControls(groupRef.current.children, camera, gl.domElement);
       dragControlsRef.current = controls;
 
-      const distance = groupRef.current.position.distanceTo(camera.position);
+      //const distance = groupRef.current.position.distanceTo(camera.position);
        // Justera hastighetsfaktorn baserat på avståndet
-       setDragSpeed(0.01 * distance);
+       //setDragSpeed(0.01 * (distance / distance));
+
+
+       const onDragStart = (event) => {
+        console.log('Drag started', event);
+        console.log("Position on start", event.object.position);
+        plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), event.object.position);
+        console.log('Plane set', plane);
+      };
+
       const onDrag = (event) => {
-        const { movementX, movementY } = event;
-        const speedX = movementX * dragSpeed;
-        const speedY = movementY * dragSpeed;
-        //event.object.position.x += speedX;
-        //event.object.position.y += speedY;
-        console.log("SpeedX", movementX,"SpeedY", movementY)
+        // Get the mouse position in normalized device coordinates (-1 to +1)
+        mouseVec.x = (mouse.x / window.innerWidth) * 2 - 1;
+        mouseVec.y = -(mouse.y / window.innerHeight) * 2 + 1;
+
+        // Update the picking ray with the camera and mouse position
+        raycaster.setFromCamera(mouseVec, camera);
+
+        // Calculate objects intersecting the picking ray
+        raycaster.ray.intersectPlane(plane, planeIntersect);
+        //console.log("MouseX",mouse.x ,"MouseY", mouse.y)
+        
+        console.log('Mouse position', mouse);
+        console.log('Raycaster ray', raycaster.ray);
+        console.log('Plane intersect', planeIntersect);
+        if (true) {
+          event.object.position.copy(planeIntersect);
+        }
         if(event.object.position.y <= -1)
           {
             event.object.position.y = -1;
           }
       };
 
-      const onDragStart = (event) => {
-        console.log('Drag started', event);
-        console.log("Position on start", event.object.position);
-      };
 
       const onDragEnd = (event) => {
         console.log('Drag ended', event);
