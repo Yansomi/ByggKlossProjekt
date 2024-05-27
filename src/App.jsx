@@ -22,7 +22,7 @@ function App() {
         <ambientLight intensity={0.5}/>
         <spotLight position={[-20, -20, -30]} angle={0.15} penumbra={1}/>
         <pointLight position={[-30, -20, -20]}/>
-        <Model 
+        <Model
         rotation={[0.2,0,0]} 
         scale={[2,2,2]}/>
         <Grid args={[100, 100]}cellSize={[10,10]} />

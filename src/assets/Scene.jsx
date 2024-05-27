@@ -7,7 +7,7 @@ License: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
 Source: https://sketchfab.com/3d-models/lego-brick-baf29903f6ed40d992b8838f58703c09
 Title: Lego Brick
 */
-import React, { useRef, useEffect,useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useThree, extend } from '@react-three/fiber';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
@@ -20,67 +20,46 @@ export function Model(props) {
   const { nodes, materials } = useGLTF(scenePath);
   const groupRef = useRef();
   const dragControlsRef = useRef();
-  const { camera, gl, mouse } = useThree();
-  //const [dragSpeed, setDragSpeed] = useState(0.01); // Initial hastighetsfaktor
-
-  const mouseVec = new THREE.Vector2();
-  const raycaster = new THREE.Raycaster();
-
+  const { camera, gl, raycaster, mouse } = useThree();
   const plane = new THREE.Plane();
-  const planeNormal = new THREE.Vector3(0, 1, 0);
   const planeIntersect = new THREE.Vector3();
+  const lastPosition = useRef(new THREE.Vector3());
+
+  const onDrag = (event) => {
+    if (!event.object) return;
+    raycaster.setFromCamera(mouse, camera);
+    raycaster.ray.intersectPlane(plane, planeIntersect);
+  /*   const delta = new THREE.Vector3().subVectors(planeIntersect, lastPosition.current);
+    const speed = 0.001; // Adjust the speed here
+    const cameraDistance = camera.position.distanceTo(groupRef.current.position);
+    groupRef.current.position.addScaledVector(delta, speed * cameraDistance); */
+    lastPosition.current.copy(planeIntersect);
+  };
+
+  const onDragStart = (event) => {
+    if (!event.object) return;
+    raycaster.setFromCamera(mouse, camera);
+    // Calculate the plane to be perpendicular to the camera direction
+    plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), groupRef.current.position);
+    raycaster.ray.intersectPlane(plane, planeIntersect);
+    lastPosition.current.copy(planeIntersect);
+    document.body.style.cursor = 'none'; // Hide the cursor
+  };
+
+  const onDragEnd = (event) => {
+    if (!event.object) return;
+    document.body.style.cursor = 'default'; // Reset the cursor
+  };
+
   useEffect(() => {
     if (groupRef.current) {
       const controls = new DragControls(groupRef.current.children, camera, gl.domElement);
       dragControlsRef.current = controls;
 
-      //const distance = groupRef.current.position.distanceTo(camera.position);
-       // Justera hastighetsfaktorn baserat på avståndet
-       //setDragSpeed(0.01 * (distance / distance));
-
-
-       const onDragStart = (event) => {
-        console.log('Drag started', event);
-        console.log("Position on start", event.object.position);
-        plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), event.object.position);
-        console.log('Plane set', plane);
-      };
-
-      const onDrag = (event) => {
-        // Get the mouse position in normalized device coordinates (-1 to +1)
-        mouseVec.x = (mouse.x / window.innerWidth) * 2 - 1;
-        mouseVec.y = -(mouse.y / window.innerHeight) * 2 + 1;
-
-        // Update the picking ray with the camera and mouse position
-        raycaster.setFromCamera(mouseVec, camera);
-
-        // Calculate objects intersecting the picking ray
-        raycaster.ray.intersectPlane(plane, planeIntersect);
-        //console.log("MouseX",mouse.x ,"MouseY", mouse.y)
-        
-        console.log('Mouse position', mouse);
-        console.log('Raycaster ray', raycaster.ray);
-        console.log('Plane intersect', planeIntersect);
-        if (true) {
-          event.object.position.copy(planeIntersect);
-        }
-        if(event.object.position.y <= -1)
-          {
-            event.object.position.y = -1;
-          }
-      };
-
-
-      const onDragEnd = (event) => {
-        console.log('Drag ended', event);
-        console.log("Position on ended", event.object.position);
-      };
-
       controls.addEventListener('drag', onDrag);
       controls.addEventListener('dragstart', onDragStart);
       controls.addEventListener('dragend', onDragEnd);
 
-      // Cleanup event listeners on component unmount
       return () => {
         controls.removeEventListener('drag', onDrag);
         controls.removeEventListener('dragstart', onDragStart);
@@ -88,7 +67,21 @@ export function Model(props) {
         controls.dispose();
       };
     }
-  }, [camera, gl]);
+  }, [camera, gl, raycaster, mouse]);
+
+  useEffect(() => {
+    const handlePointerMove = (event) => {
+      const rect = gl.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    };
+
+    gl.domElement.addEventListener('pointermove', handlePointerMove);
+
+    return () => {
+      gl.domElement.removeEventListener('pointermove', handlePointerMove);
+    };
+  }, [gl.domElement, mouse]);
 
   return (
     <group ref={groupRef} {...props} dispose={null}>
