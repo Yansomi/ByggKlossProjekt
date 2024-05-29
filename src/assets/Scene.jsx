@@ -53,10 +53,15 @@ export function Model({ id, position, scale, grid, allModels, updateModelPositio
   const planeIntersect = new THREE.Vector3();
   const lastPosition = useRef(new THREE.Vector3());
   const allModelsRef = useRef(allModels);
+  const trashCornerRef = useRef(trashCorner);
 
   useEffect(() => {
     allModelsRef.current = allModels;
   }, [allModels]);
+
+  useEffect(() => {
+    trashCornerRef.current = trashCorner;
+  }, [trashCorner]);
 
   const modelHeight = 1; // Assuming the model height is 2 units
   const gridBoundary = calculateGridBoundary(grid.size);
@@ -83,14 +88,16 @@ export function Model({ id, position, scale, grid, allModels, updateModelPositio
     const snappedToModelsPosition = snapToOtherModels(snappedPosition, allModelsRef.current, id, modelHeight);
   
     // Kontrollera om modellen är i sophörnan
+    const currentTrashCorner = trashCornerRef.current;
     const isInTrashCorner =
-      snappedToModelsPosition.x >= trashCorner.x &&
-      snappedToModelsPosition.x <= trashCorner.x + trashCorner.size &&
-      snappedToModelsPosition.z >= trashCorner.z &&
-      snappedToModelsPosition.z <= trashCorner.z + trashCorner.size;
+    snappedToModelsPosition.x >= currentTrashCorner.x / 2 - currentTrashCorner.size / 2 &&
+    snappedToModelsPosition.x <= currentTrashCorner.x / 2 + currentTrashCorner.size / 2 &&
+    snappedToModelsPosition.z >= currentTrashCorner.z / 2 - currentTrashCorner.size / 2 &&
+    snappedToModelsPosition.z <= currentTrashCorner.z / 2 + currentTrashCorner.size / 2;
   
+    console.log("model position", snappedToModelsPosition);
     console.log('snappedToModelsPosition:', snappedToModelsPosition);
-    console.log('trashCorner:', trashCorner);
+    console.log('trashCorner:', trashCornerRef.current);
     console.log('isInTrashCorner:', isInTrashCorner);
   
     if (isInTrashCorner) {
@@ -113,12 +120,12 @@ export function Model({ id, position, scale, grid, allModels, updateModelPositio
     plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), groupRef.current.position);
     raycaster.ray.intersectPlane(plane, planeIntersect);
     lastPosition.current.copy(planeIntersect);
-    document.body.style.cursor = 'none'; // Hide the cursor
+    //document.body.style.cursor = 'none'; // Hide the cursor
   };
 
   const onDragEnd = (event) => {
     if (!event.object) return;
-    document.body.style.cursor = 'default'; // Reset the cursor
+    //document.body.style.cursor = 'default'; // Reset the cursor
   };
 
   useEffect(() => {

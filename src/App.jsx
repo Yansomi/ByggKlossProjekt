@@ -11,11 +11,11 @@ function App() {
   const [cellSize, setCellSize] = useState(3.6);
   const cameraRef = useRef();
   const canvasRef = useRef();
-
+  const trashCornerSize = 20;
   const calculateTrashCornerPosition = (gridSize) => ({
-    x: gridSize / 2 + 10, // Placerar sophörnan bredvid grid
-    z: gridSize / 2 + 10,
-    size: 10, // Storleken på sophörnan
+    x: gridSize / 2 + (trashCornerSize / 2), // Placerar sophörnan bredvid grid
+    z: gridSize / 2 + (trashCornerSize / 2),
+    size: trashCornerSize / 2, // Storleken på sophörnan
   });
 
   const [trashCorner, setTrashCorner] = useState(calculateTrashCornerPosition(gridSize));
