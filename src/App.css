@@ -8,6 +8,14 @@
 body{
   margin: 0;
   padding: 0;
-  background: greenyellow;
+  background: rgb(171, 225, 22);
   overflow: hidden;
+}
+.buttonPos{
+  position: relative;
+  left: 40px;
+  top: 40px;
+}
+.grid{
+  color: #1409f0;
 }

@@ -7,16 +7,44 @@ License: CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
 Source: https://sketchfab.com/3d-models/lego-brick-baf29903f6ed40d992b8838f58703c09
 Title: Lego Brick
 */
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useThree, extend } from '@react-three/fiber';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
-import scenePath from '../assets/scene-transformed.glb';
+import scenePath from '../assets/agab_block_1600x800x800-transformed.glb';
 import * as THREE from 'three';
-
 extend({ DragControls });
 
-export function Model(props) {
+// Funktion för att beräkna gridBoundary baserat på gridSize
+function calculateGridBoundary(gridSize) {
+  return {
+    minX: -gridSize / 2,
+    maxX: gridSize / 2,
+    minZ: -gridSize / 2,
+    maxZ: gridSize / 2,
+    minY: 0,
+  };
+}
+
+function snapToGrid(position, cellSize) {
+  const snappedPosition = position.clone();
+  snappedPosition.x = Math.round(snappedPosition.x / cellSize) * cellSize;
+  snappedPosition.z = Math.round(snappedPosition.z / cellSize) * cellSize;
+  return snappedPosition;
+}
+
+function snapToOtherModels(position, models, currentModelId, modelHeight, threshold = 1) {
+  models.forEach((model) => {
+    if (model.id !== currentModelId && 
+        Math.abs(position.x - model.position[0]) < threshold && 
+        Math.abs(position.z - model.position[2]) < threshold) {
+      position.y = model.position[1] + modelHeight; // Snap the model exactly on top of the other model
+    }
+  });
+  return position;
+}
+
+export function Model({ id, position, scale, grid, allModels, updateModelPosition, removeModel, trashCorner }) {
   const { nodes, materials } = useGLTF(scenePath);
   const groupRef = useRef();
   const dragControlsRef = useRef();
@@ -24,22 +52,64 @@ export function Model(props) {
   const plane = new THREE.Plane();
   const planeIntersect = new THREE.Vector3();
   const lastPosition = useRef(new THREE.Vector3());
+  const allModelsRef = useRef(allModels);
+
+  useEffect(() => {
+    allModelsRef.current = allModels;
+  }, [allModels]);
+
+  const modelHeight = 1; // Assuming the model height is 2 units
+  const gridBoundary = calculateGridBoundary(grid.size);
 
   const onDrag = (event) => {
     if (!event.object) return;
+  
     raycaster.setFromCamera(mouse, camera);
     raycaster.ray.intersectPlane(plane, planeIntersect);
-  /*   const delta = new THREE.Vector3().subVectors(planeIntersect, lastPosition.current);
-    const speed = 0.001; // Adjust the speed here
-    const cameraDistance = camera.position.distanceTo(groupRef.current.position);
-    groupRef.current.position.addScaledVector(delta, speed * cameraDistance); */
+  
+    const delta = new THREE.Vector3().subVectors(planeIntersect, lastPosition.current);
+    const speed = 0.5; // Justera hastigheten här
+    const newPosition = new THREE.Vector3().copy(event.object.position).add(delta.multiplyScalar(speed));
+  
+    // Begränsa den nya positionen inom gridens gränser
+    newPosition.x = THREE.MathUtils.clamp(newPosition.x, gridBoundary.minX, gridBoundary.maxX);
+    newPosition.z = THREE.MathUtils.clamp(newPosition.z, gridBoundary.minZ, gridBoundary.maxZ);
+    newPosition.y = THREE.MathUtils.clamp(newPosition.y, gridBoundary.minY, 5);
+  
+    // Snappa till griden
+    const snappedPosition = snapToGrid(newPosition, grid.cellSize);
+  
+    // Snappa till andra modeller
+    const snappedToModelsPosition = snapToOtherModels(snappedPosition, allModelsRef.current, id, modelHeight);
+  
+    // Kontrollera om modellen är i sophörnan
+    const isInTrashCorner =
+      snappedToModelsPosition.x >= trashCorner.x &&
+      snappedToModelsPosition.x <= trashCorner.x + trashCorner.size &&
+      snappedToModelsPosition.z >= trashCorner.z &&
+      snappedToModelsPosition.z <= trashCorner.z + trashCorner.size;
+  
+    console.log('snappedToModelsPosition:', snappedToModelsPosition);
+    console.log('trashCorner:', trashCorner);
+    console.log('isInTrashCorner:', isInTrashCorner);
+  
+    if (isInTrashCorner) {
+      // Ta bort modellen
+      console.log(`Removing model ${id}`);
+      removeModel(id);
+      return;
+    }
+  
+    event.object.position.copy(snappedToModelsPosition);
     lastPosition.current.copy(planeIntersect);
+  
+    // Uppdatera modellens position i App-komponenten
+    updateModelPosition(id, snappedToModelsPosition.toArray());
   };
 
   const onDragStart = (event) => {
     if (!event.object) return;
     raycaster.setFromCamera(mouse, camera);
-    // Calculate the plane to be perpendicular to the camera direction
     plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), groupRef.current.position);
     raycaster.ray.intersectPlane(plane, planeIntersect);
     lastPosition.current.copy(planeIntersect);
@@ -84,14 +154,13 @@ export function Model(props) {
   }, [gl.domElement, mouse]);
 
   return (
-    <group ref={groupRef} {...props} dispose={null}>
-      <mesh 
-        geometry={nodes.Object_2.geometry}
-        material={materials.LegoBrick1Mtl}
-        rotation={[-Math.PI / 2, 0, 0]}
-      />
+    <group {...grid} ref={groupRef} position={position} scale={scale} dispose={null}>
+      <mesh geometry={nodes.Plane.geometry} material={materials['Material.001']}  scale={[3.6, 4, 1.6]} />
     </group>
   );
 }
 
 useGLTF.preload(scenePath);
+
+
+
