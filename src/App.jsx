@@ -6,7 +6,7 @@ import { OrbitControls, Grid } from '@react-three/drei';
 import { MOUSE } from 'three';
 
 function App() {
-  const [models, setModels] = useState([{ id: 1, position: [0, 0, 0] }]);
+  const [models, setModels] = useState([]);
   const [gridSize, setGridSize] = useState(100);
   const [cellSize, setCellSize] = useState(3.6);
   const cameraRef = useRef();
@@ -44,6 +44,14 @@ function App() {
       )
     );
   };
+
+/*   const rotateModel = (id) => {
+    setModels((prevModels) =>
+      prevModels.map((model) =>
+        model.id === id ? { ...model, rotation: model.rotation + Math.PI / 2 } : model
+      )
+    );
+  }; */
 
   const removeModel = (id) => {
     setModels((prevModels) => prevModels.filter((model) => model.id !== id));
@@ -90,6 +98,7 @@ function App() {
             updateModelPosition={updateModelPosition}
             removeModel={removeModel}
             trashCorner={trashCorner}
+            rotation={model.rotation}
           />
         ))}
         {/* Visualisera sophörnan */}

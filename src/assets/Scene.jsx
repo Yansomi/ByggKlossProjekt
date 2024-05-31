@@ -44,7 +44,7 @@ function snapToOtherModels(position, models, currentModelId, modelHeight, thresh
   return position;
 }
 
-export function Model({ id, position, scale, grid, allModels, updateModelPosition, removeModel, trashCorner }) {
+export function Model({ id, position, scale, grid, allModels, updateModelPosition, removeModel, trashCorner,rotation }) {
   const { nodes, materials } = useGLTF(scenePath);
   const groupRef = useRef();
   const dragControlsRef = useRef();
