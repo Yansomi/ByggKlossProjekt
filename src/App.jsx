@@ -4,18 +4,20 @@ import { Canvas } from '@react-three/fiber';
 import { Model } from '../src/assets/Scene';
 import { OrbitControls, Grid } from '@react-three/drei';
 import { MOUSE } from 'three';
+import { positionWorld } from 'three/examples/jsm/nodes/Nodes.js';
 
 function App() {
   const [models, setModels] = useState([]);
   const [gridSize, setGridSize] = useState(100);
   const [cellSize, setCellSize] = useState(3.6);
+  const [lastMovedModelId, setLastMovedModelId] = useState(null);
   const cameraRef = useRef();
   const canvasRef = useRef();
   const trashCornerSize = 20;
   const calculateTrashCornerPosition = (gridSize) => ({
-    x: gridSize / 2 + (trashCornerSize / 2), // Placerar sophörnan bredvid grid
-    z: gridSize / 2 + (trashCornerSize / 2),
-    size: trashCornerSize / 2, // Storleken på sophörnan
+    x: gridSize / 2 + trashCornerSize / 2,
+    z: gridSize / 2 + trashCornerSize / 2,
+    size: trashCornerSize / 2,
   });
 
   const [trashCorner, setTrashCorner] = useState(calculateTrashCornerPosition(gridSize));
@@ -26,7 +28,7 @@ function App() {
 
   const addModel = () => {
     const newId = models.length ? models[models.length - 1].id + 1 : 1;
-    setModels([...models, { id: newId, position: [10, 1, 10] }]);
+    setModels([...models, { id: newId, position: [1, 1, 1], rotation: 0 }]);
   };
 
   const handleGridSizeChange = (event) => {
@@ -37,30 +39,37 @@ function App() {
     setCellSize(Number(event.target.value));
   };
 
-  const updateModelPosition = (id, newPosition) => {
+  const updateModelPosition = (id, newPosition, newRotation) => {
     setModels((prevModels) =>
       prevModels.map((model) =>
-        model.id === id ? { ...model, position: newPosition } : model
+        model.id === id ? { ...model, position: newPosition, rotation: newRotation } : model
       )
     );
+    console.log("modelPos",models[0].position);
+    setLastMovedModelId(id);
   };
-
-/*   const rotateModel = (id) => {
-    setModels((prevModels) =>
-      prevModels.map((model) =>
-        model.id === id ? { ...model, rotation: model.rotation + Math.PI / 2 } : model
-      )
-    );
-  }; */
 
   const removeModel = (id) => {
     setModels((prevModels) => prevModels.filter((model) => model.id !== id));
+  };
+
+  const rotateModel = () => {
+    if (lastMovedModelId !== null) {
+      setModels((prevModels) =>
+        prevModels.map((model) =>
+          model.id === lastMovedModelId
+            ? { ...model,positionWorld:model.position, rotation: (model.rotation + Math.PI / 2) % (2 * Math.PI) }
+            : model
+        )
+      );
+    }
   };
 
   return (
     <>
       <div rel='buttonPos'>
         <button onClick={addModel}>Add Model</button>
+        <button onClick={rotateModel}>Rotate Last Moved Model</button>
         <div>
           <label>
             Grid Size:
@@ -92,8 +101,8 @@ function App() {
             key={model.id}
             id={model.id}
             position={model.position}
-            
-            grid={{ size: gridSize, cellSize }}
+            gridSize={gridSize}
+            cellSize={cellSize}
             allModels={models}
             updateModelPosition={updateModelPosition}
             removeModel={removeModel}
@@ -102,7 +111,7 @@ function App() {
           />
         ))}
         {/* Visualisera sophörnan */}
-        <mesh position={[trashCorner.x, 0, trashCorner.z]}>
+        <mesh position={[trashCorner.x, 0, trashCorner.z ]}>
           <boxGeometry args={[trashCorner.size, 5, trashCorner.size]} />
           <meshBasicMaterial color="red" />
         </mesh>
@@ -112,5 +121,6 @@ function App() {
 }
 
 export default App;
+
 
 
