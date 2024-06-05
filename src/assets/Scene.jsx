@@ -35,41 +35,36 @@ function snapToOtherModels(position, models, currentModelId, modelHeight, thresh
   return position;
 }
 
-export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation }) {
+export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId ,groupRef,dragControlsRef}) {
   const { nodes, materials } = useGLTF(scenePath);
-  const groupRef = useRef();
-  const dragControlsRef = useRef();
   const { camera, gl, raycaster, mouse } = useThree();
   const plane = new THREE.Plane();
   const planeIntersect = new THREE.Vector3();
   const lastPosition = useRef(new THREE.Vector3());
   const allModelsRef = useRef(allModels);
   const trashCornerRef = useRef(trashCorner);
-  const [currentRotation, setCurrentRotation] = useState(rotation);
-  const [currentPosition, setCurrentposition] = useState(position);
-
   useEffect(() => {
     allModelsRef.current = allModels;
   }, [allModels]);
-
   useEffect(() => {
     trashCornerRef.current = trashCorner;
   }, [trashCorner]);
 
-  useEffect(() => {
+/*   useEffect(() => {
     if (groupRef.current) {
-      groupRef.current.rotation.order = 'YXZ';
-      groupRef.current.rotation.y = currentRotation; // Ensure the model's rotation is set
+      //groupRef.current.rotation.order = 'YXZ';
+      //groupRef.current.rotation.y = currentRotation; // Ensure the model's rotation is set
       //groupRef.current.position.copy(currentPosition);
-      updateModelPosition(id, groupRef.current.position ,groupRef.current.rotation.y);
+      //updateModelPosition(id, groupRef.current.position ,groupRef.current.rotation.y);
     }
-  }, [currentRotation, currentPosition]);
+  }, [currentRotation, currentPosition]); */
 
   useEffect(() => {
-    setCurrentRotation(rotation); // Update state when rotation prop changes
-    setCurrentposition(position);
+
+    groupRef.current.position.copy(new THREE.Vector3().fromArray(position));
+    groupRef.current.rotation.y = rotation;
+    console.log("position", groupRef.current.position);
     console.log("rotation", rotation);
-    console.log("position", position);
   }, [rotation, position]);
 
 
@@ -98,8 +93,8 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     const delta = new THREE.Vector3().subVectors(planeIntersect, lastPosition.current);
     const speed = 0.5; // Justera hastigheten här
 
-    const inverseRotationMatrix = new THREE.Matrix4().makeRotationY(-currentRotation);
-    delta.applyMatrix4(inverseRotationMatrix);
+/*     const inverseRotationMatrix = new THREE.Matrix4().makeRotationY(-groupRef.current.rotation.y);
+    delta.applyMatrix4(inverseRotationMatrix); */
 
     const newPosition = new THREE.Vector3().copy(event.object.position).add(delta.multiplyScalar(speed));
 
@@ -127,7 +122,6 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
 
         // Begränsa den nya positionen inom modellens gränser
-    console.log("position", event.object.position);
 
     if (isInTrashCorner) {
       // Ta bort modellen
@@ -138,8 +132,10 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     event.object.position.copy(snappedToModelsPosition);
     lastPosition.current.copy(planeIntersect);
 
+    groupRef.current.position.copy(snappedToModelsPosition);
     // Uppdatera modellens position i App-komponenten
-    updateModelPosition(id, snappedToModelsPosition.toArray(),groupRef.current.rotation.y);
+    console.log("position", event.object.position.toArray());
+    updateModelPosition(id, groupRef.current.position.toArray(),groupRef.current.rotation.y);
   };
 
   const onDragStart = (event) => {
@@ -154,9 +150,14 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     console.log(event.object);
     if (!event.object) return;
     const finalPosition = snapToGrid(event.object.position, cellSize);
-    updateModelPosition(id, finalPosition.toArray(),groupRef.current.rotation.y);
-    console.log("drag end pos", finalPosition);
-    setDragControlsEnabled(true);
+    groupRef.current.position.copy(finalPosition);
+
+    console.log("drag end pos", groupRef.current.position.toArray());
+    //console.log("Rotation end", groupRef.current.rotation.y);
+    console.log("id",id);
+
+    updateModelPosition(id, groupRef.current.position.toArray(),groupRef.current.rotation.y);
+    setLastMovedModelId(id);
   };
   useEffect(() => {
     if (dragControlsEnabled) {
@@ -169,13 +170,28 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
   useEffect(() => {
     if (groupRef.current) {
+      console.log("current groupRef", groupRef.current);
+      const transformGroup = new THREE.Group();
+      
+/*       for(let i = 0;i < groupRef.current.children.length;i++)
+      {
+        console.log("group child", groupRef.current.children[i]);
+        transformGroup.add(groupRef.current.children[i]);
+      } */
+/*       groupRef.current.children.forEach((child) => {
+        console.log("Adding child to transformGroup:", child);
+        transformGroup.add(child);
+      }); */
       const controls = new DragControls(groupRef.current.children, camera, gl.domElement);
+      //controls.transformGroup = transformGroup;
+      /*const transformGroup = new THREE.Group();
+      groupRef.current.children.forEach(child => transformGroup.add(child));
+      const controls = new DragControls(transformGroup.children, camera, gl.domElement); */
       dragControlsRef.current = controls;
 
       controls.addEventListener('drag', onDrag);
       controls.addEventListener('dragstart', onDragStart);
       controls.addEventListener('dragend', onDragEnd);
-
       return () => {
         controls.removeEventListener('drag', onDrag);
         controls.removeEventListener('dragstart', onDragStart);
@@ -183,7 +199,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
         controls.dispose();
       };
     }
-  }, [camera, gl, raycaster, mouse]);
+  }, [camera, gl, groupRef, raycaster, mouse,]);
 
   useEffect(() => {
     const handlePointerMove = (event) => {
@@ -200,6 +216,11 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
   }, [gl.domElement, mouse]);
 
 
+  useEffect(() => {
+    if (groupRef.current) {
+      console.log("GrouprefPos", groupRef.current.position);
+    }
+  }, [groupRef.current]);
 
   return (
   <group>
@@ -211,8 +232,3 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 }
 
 useGLTF.preload(scenePath);
-
-
-
-
-
