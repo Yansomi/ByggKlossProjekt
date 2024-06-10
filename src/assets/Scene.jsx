@@ -48,7 +48,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
     newPosition.x = THREE.MathUtils.clamp(newPosition.x, gridBoundary.minX, gridBoundary.maxX + 10);
     newPosition.z = THREE.MathUtils.clamp(newPosition.z, gridBoundary.minZ, gridBoundary.maxZ + 10);
-    newPosition.y = THREE.MathUtils.clamp(newPosition.y, gridBoundary.minY, 5);
+    newPosition.y = THREE.MathUtils.clamp(newPosition.y, gridBoundary.minY, 20);
 
     const snappedPosition = snapToGrid(newPosition, cellSize);
 

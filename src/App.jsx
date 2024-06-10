@@ -106,8 +106,12 @@ function App() {
             RIGHT: MOUSE.ROTATE,
           }}
         />
-        <ambientLight intensity={0.8} />
-        <spotLight position={[-20, -20, -30]} angle={0.15} penumbra={1} />
+        <ambientLight intensity={0.2} />
+        <spotLight position={[0, 20, 0]} angle={1.5} penumbra={1} intensity={1} power={90}/>
+        <spotLight position={[0, 20, 5]} angle={1.5} penumbra={1} intensity={1} power={90}/>
+        <spotLight position={[5, 20, 0]} angle={1.5} penumbra={1} intensity={1} power={90}/>
+        <spotLight position={[5, 20, 5]} angle={1.5} penumbra={1} intensity={1} power={90}/>
+
         <pointLight position={[-30, -20, -20]} />
         {models.map((model) => (
         <Model
