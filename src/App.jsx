@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { Canvas } from '@react-three/fiber';
 import { Model } from '../src/assets/Scene';
@@ -14,8 +14,6 @@ function App() {
   const cameraRef = useRef();
   const canvasRef = useRef();
   const trashCornerSize = 20;
-  const groupRef = useRef();
-  const dragControlsRef = useRef();
   const calculateTrashCornerPosition = (gridSize) => ({
     x: gridSize / 2 + trashCornerSize / 2,
     z: gridSize / 2 + trashCornerSize / 2,
@@ -45,22 +43,19 @@ function App() {
     setCellSize(Number(event.target.value));
   };
 
-  const updateModelPosition = (id, newPosition, newRotation) => {
-    console.log("updateModelPosition called with:", { id, newPosition, newRotation });
+  const updateModelPosition = (id, newPosition) => {
   
     setModels((prevModels) => {
       const updatedModels = prevModels.map((model) => {
         if (model.id === id) {
-          console.log("Updating model:", { ...model, position: newPosition, rotation: newRotation });
-          return { ...model, position: newPosition, rotation: newRotation };
+          return { ...model, position: newPosition };
         }
         return model;
       });
-      console.log("Updated models state:", updatedModels);
+
       return updatedModels;
     });
   
-    console.log("newPos after setModels:", newPosition);
   };
   
 
@@ -70,23 +65,18 @@ function App() {
 
   const rotateModel = () => {
     if (lastMovedModelId !== null) {
-      setModels((prevModels) =>
-        prevModels.map((model) =>
-          model.id === lastMovedModelId
-            ? { ...model, positionWorld: model.position, rotation: (model.rotation + Math.PI / 2) % (2 * Math.PI) }
-            : model
-        )
-      );
-      // Omvandla den sparade positionen från världskoordinater till lokala koordinater för den roterade modellen
-      const localPosition = new THREE.Vector3().copy(groupRef.current.position);
-      groupRef.current.worldToLocal(localPosition);
-      // Använd de omvandlade lokala koordinaterna för att uppdatera dragkontrollerna
-      dragControlsRef.current.activate();
-      //dragControlsRef.current.transformGroup.localToWorld(localPosition);
-      dragControlsRef.current.object.localToWorld(localPosition);
-      dragControlsRef.current.dispatchEvent({ type: "drag", object: groupRef.current });
+      setModels((prevModels) => {
+        return prevModels.map((model) => {
+          if (model.id === lastMovedModelId) {
+            const newRotation = (model.rotation + Math.PI / 2) % (2 * Math.PI);
+            return { ...model, rotation: newRotation };
+          }
+          return model;
+        });
+      });
     }
   };
+  
 
   return (
     <>
@@ -132,8 +122,6 @@ function App() {
           trashCorner={trashCorner}
           rotation={model.rotation}
           setLastMovedModelId={setLastMovedModelId}
-          groupRef={groupRef}
-          dragControlsRef={dragControlsRef}
         />
 ))}
         {/* Visualisera sophörnan */}
@@ -147,3 +135,5 @@ function App() {
 }
 
 export default App;
+
+
