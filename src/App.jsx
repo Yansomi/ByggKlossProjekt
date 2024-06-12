@@ -9,7 +9,7 @@ import * as THREE from 'three';
 function App() {
   const [models, setModels] = useState([]);
   const [gridSize, setGridSize] = useState(100);
-  const [cellSize, setCellSize] = useState(3.6);
+  const [cellSize, setCellSize] = useState(3.2);
   const [lastMovedModelId, setLastMovedModelId] = useState(null);
   const cameraRef = useRef();
   const canvasRef = useRef();
@@ -30,7 +30,7 @@ function App() {
     setModels((prevModels) => {
       const newId = prevModels.length ? prevModels[prevModels.length - 1].id + 1 : 1;
       const initialPosition = [1, 0, 1]; // Set an appropriate initial position
-      const newModel = { id: newId, position: initialPosition, rotation: 0 };
+      const newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2 };
       return [...prevModels, newModel];
     });
   };
@@ -76,6 +76,26 @@ function App() {
       });
     }
   };
+
+  const createSpotlights = (gridSize, distance) => {
+    const spotlights = [];
+    for (let x = -gridSize / 2; x <= gridSize / 2; x += distance) {
+      for (let z = -gridSize / 2; z <= gridSize / 2; z += distance) {
+        spotlights.push(
+          <spotLight
+            key={`${x}-${z}`}
+            position={[x, 20, z]}
+            angle={Math.PI / 2}
+            penumbra={0.5}
+            intensity={0.8}
+            distance={30}
+            power={100}
+          />
+        );
+      }
+    }
+    return spotlights;
+  };
   
 
   return (
@@ -107,12 +127,7 @@ function App() {
           }}
         />
         <ambientLight intensity={0.2} />
-        <spotLight position={[0, 20, 0]} angle={1.5} penumbra={1} intensity={1} power={90}/>
-        <spotLight position={[0, 20, 5]} angle={1.5} penumbra={1} intensity={1} power={90}/>
-        <spotLight position={[5, 20, 0]} angle={1.5} penumbra={1} intensity={1} power={90}/>
-        <spotLight position={[5, 20, 5]} angle={1.5} penumbra={1} intensity={1} power={90}/>
-
-        <pointLight position={[-30, -20, -20]} />
+        {createSpotlights(gridSize, 20)}
         {models.map((model) => (
         <Model
           key={model.id}
