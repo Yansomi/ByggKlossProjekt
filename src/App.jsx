@@ -29,7 +29,7 @@ function App() {
   const addModel = () => {
     setModels((prevModels) => {
       const newId = prevModels.length ? prevModels[prevModels.length - 1].id + 1 : 1;
-      const initialPosition = [1, 0, 1]; // Set an appropriate initial position
+      const initialPosition = [0, 0, 0]; // Set an appropriate initial position
       const newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2 };
       return [...prevModels, newModel];
     });
@@ -88,7 +88,7 @@ function App() {
             angle={Math.PI / 2}
             penumbra={0.5}
             intensity={0.8}
-            distance={30}
+            distance={40}
             power={100}
           />
         );

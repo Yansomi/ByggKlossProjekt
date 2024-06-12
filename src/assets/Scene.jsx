@@ -53,10 +53,9 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     const snappedPosition = snapToGrid(newPosition, cellSize, groupRef);
     groupRef.current.position.copy(snappedPosition);
     const snappedToModelsPosition = snapToOtherModels(groupRef, allModelsRef.current, id);
-
+    console.log("Snapped before", snappedToModelsPosition);
     const worldPosition = new THREE.Vector3();
     groupRef.current.localToWorld(worldPosition.copy(snappedToModelsPosition));
-
     const currentTrashCorner = trashCornerRef.current;
     const isInTrashCorner =
       worldPosition.x >= currentTrashCorner.x - currentTrashCorner.size / 2 &&
@@ -68,34 +67,50 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
       removeModel(id);
       return;
     }
-    const box = new THREE.Box3().setFromObject(groupRef.current);
+
+    const position = new THREE.Vector3();
+    event.object.getWorldPosition(position);
+    
+    const halfLengths = new THREE.Vector3(
+      groupRef.current.children[0].scale.x / 2,
+      groupRef.current.children[0].scale.y / 2,
+      groupRef.current.children[0].scale.z / 2
+    );
+
+    const box = {
+      center: position,
+      halfLengths: halfLengths,
+      rotationMatrix: new THREE.Matrix4().makeRotationY(groupRef.current.rotation.y)
+    };
     const collisionResult = detectCollision(box, allModels, id);
 
-    if (collisionResult.overlap) {
-      const overlapX = Math.max(0, Math.min(box.max.x, collisionResult.modelBox.max.x) - Math.max(box.min.x, collisionResult.modelBox.min.x));
-      const overlapZ = Math.max(0, Math.min(box.max.z, collisionResult.modelBox.max.z) - Math.max(box.min.z, collisionResult.modelBox.min.z));
-      
-      if (overlapX < overlapZ) {
-        if (event.object.position.x > collisionResult.modelBox.min.x) {
-          snappedToModelsPosition.x += overlapX;
-        } else {
-          snappedToModelsPosition.x -= overlapX;
-        }
+  // Check for collision and adjust position
+  if (collisionResult.overlap) {
+    const overlapX = Math.max(0, Math.min(box.center.x + box.halfLengths.x, collisionResult.obb.center.x + collisionResult.obb.halfLengths.x) - Math.max(box.center.x - box.halfLengths.x, collisionResult.obb.center.x - collisionResult.obb.halfLengths.x));
+    const overlapZ = Math.max(0, Math.min(box.center.z + box.halfLengths.z, collisionResult.obb.center.z + collisionResult.obb.halfLengths.z) - Math.max(box.center.z - box.halfLengths.z, collisionResult.obb.center.z - collisionResult.obb.halfLengths.z));
+    
+    if (overlapX < overlapZ) {
+      console.log("Collision");
+      if (event.object.position.x > collisionResult.obb.center.x) {
+        snappedToModelsPosition.x += overlapX;
       } else {
-        if (event.object.position.z > collisionResult.modelBox.min.z) {
-          snappedToModelsPosition.z += overlapZ;
-        } else {
-          snappedToModelsPosition.z -= overlapZ;
-        }
+        snappedToModelsPosition.x -= overlapX;
+      }
+    } else {
+      if (event.object.position.z > collisionResult.obb.center.z) {
+        snappedToModelsPosition.z += overlapZ;
+      } else {
+        snappedToModelsPosition.z -= overlapZ;
       }
     }
-
+  }
+    console.log("current", event.object.position);
+    console.log("Snapped", snappedToModelsPosition);
     event.object.position.copy(snappedToModelsPosition);
     lastPosition.current.copy(planeIntersect);
 
     //groupRef.current.position.copy(snappedToModelsPosition);
     updateModelPosition(id, groupRef.current.position.toArray());
-    console.log("currentZ", groupRef.current.position.z);
   };
 
   const onDragStart = (event) => {
@@ -197,40 +212,88 @@ function snapToGrid(position, cellSize,groupRef) {
       xOnLenght = false;
     };
   console.log(groupRef.current);
-  if(xOnLenght)
-    {
-      snappedPosition.x = Math.round(snappedPosition.x / groupRef.current.children[0].scale.x) * groupRef.current.children[0].scale.x;
-      snappedPosition.z = Math.round(snappedPosition.z / groupRef.current.children[0].scale.z) * groupRef.current.children[0].scale.z;
-    }
-    else{
-      snappedPosition.x = Math.round(snappedPosition.x / groupRef.current.children[0].scale.z) * groupRef.current.children[0].scale.z;
-      snappedPosition.z = Math.round(snappedPosition.z / groupRef.current.children[0].scale.x) * groupRef.current.children[0].scale.x;
-    }
+  console.log("position x and z",snappedPosition.x,snappedPosition.z );
+  if (xOnLenght) {
+    snappedPosition.x = Math.round(snappedPosition.x / (cellSize / 2)) * (cellSize / 2);
+    snappedPosition.z = Math.round(snappedPosition.z / (cellSize / 2)) * (cellSize / 2);
+  } else {
+    snappedPosition.x = Math.round(snappedPosition.x / (cellSize / 4) ) * (cellSize / 4) ;
+    snappedPosition.z = Math.round(snappedPosition.z / (cellSize / 4)) * (cellSize / 4);
+  }
   return snappedPosition;
 }
 function detectCollision(box, models, currentModelId) {
+  const obb1 = createOBB(box.center, box.halfLengths.x * 2, box.halfLengths.z * 2, box.halfLengths.y * 2, box.rotationMatrix);
+
   for (const model of models) {
     if (model.id !== currentModelId) {
       const modelPos = new THREE.Vector3(...model.position);
       const modelLength = model.length;
       const modelWidth = model.width;
       const modelHeight = model.hight;
+      const modelRotation = model.rotation;
 
-      const modelBox = new THREE.Box3(
-        new THREE.Vector3(modelPos.x - modelLength / 2, modelPos.y - modelHeight / 2, modelPos.z - modelWidth / 2),
-        new THREE.Vector3(modelPos.x + modelLength / 2, modelPos.y + modelHeight / 2, modelPos.z + modelWidth / 2)
-      );
+      const obb2 = createOBB(modelPos, modelLength, modelWidth, modelHeight, modelRotation);
 
-      if (box.intersectsBox(modelBox)) {
-        return { overlap: true, modelBox };
+      if (obbIntersects(obb1, obb2)) {
+        return { overlap: true, obb: obb2 };
       }
     }
   }
 
-  return { overlap: false, modelBox: null };
+  return { overlap: false, obb: null };
 }
 
-function snapToOtherModels(groupRef, models, currentModelId, threshold = 0.1) {
+function obbIntersects(obb1, obb2) {
+  const xAxis1 = new THREE.Vector3(1, 0, 0).applyMatrix4(obb1.rotationMatrix);
+  const yAxis1 = new THREE.Vector3(0, 1, 0).applyMatrix4(obb1.rotationMatrix);
+  const zAxis1 = new THREE.Vector3(0, 0, 1).applyMatrix4(obb1.rotationMatrix);
+
+  const xAxis2 = new THREE.Vector3(1, 0, 0).applyMatrix4(obb2.rotationMatrix);
+  const yAxis2 = new THREE.Vector3(0, 1, 0).applyMatrix4(obb2.rotationMatrix);
+  const zAxis2 = new THREE.Vector3(0, 0, 1).applyMatrix4(obb2.rotationMatrix);
+
+  const axes = [xAxis1, yAxis1, zAxis1, xAxis2, yAxis2, zAxis2];
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      axes.push(new THREE.Vector3().crossVectors(axes[i], axes[j]).normalize());
+    }
+  }
+
+  const centerDiff = new THREE.Vector3().subVectors(obb2.center, obb1.center);
+
+  for (const axis of axes) {
+    if (
+      Math.abs(centerDiff.dot(axis)) >
+      (obb1.halfLengths.x * Math.abs(xAxis1.dot(axis))) +
+      (obb1.halfLengths.y * Math.abs(yAxis1.dot(axis))) +
+      (obb1.halfLengths.z * Math.abs(zAxis1.dot(axis))) +
+      (obb2.halfLengths.x * Math.abs(xAxis2.dot(axis))) +
+      (obb2.halfLengths.y * Math.abs(yAxis2.dot(axis))) +
+      (obb2.halfLengths.z * Math.abs(zAxis2.dot(axis)))
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+function createOBB(position, length, width, height, rotation) {
+  const halfLengths = new THREE.Vector3(length / 2, height / 2, width / 2);
+  const center = new THREE.Vector3(position.x, position.y, position.z);
+  
+  const rotationMatrix = new THREE.Matrix4().makeRotationY(rotation);
+
+  const obb = {
+    center: center,
+    halfLengths: halfLengths,
+    rotationMatrix: rotationMatrix
+  };
+
+  return obb;
+}
+
+function snapToOtherModels(groupRef, models, currentModelId, threshold = 0.8) {
   if (!groupRef.current) {
     return;
   }
