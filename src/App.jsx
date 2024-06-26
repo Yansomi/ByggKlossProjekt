@@ -101,7 +101,7 @@ function App() {
 
   return (
     <>
-      <div rel='buttonPos'>
+      <div >
         <button className='buttonAdd' onClick={addModel}>Add Model</button>
         <button className='buttonRotate' onClick={rotateModel}>Rotate Last Moved Model</button>
         <div>
