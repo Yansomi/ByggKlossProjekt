@@ -102,8 +102,8 @@ function App() {
   return (
     <>
       <div rel='buttonPos'>
-        <button onClick={addModel}>Add Model</button>
-        <button onClick={rotateModel}>Rotate Last Moved Model</button>
+        <button className='buttonAdd' onClick={addModel}>Add Model</button>
+        <button className='buttonRotate' onClick={rotateModel}>Rotate Last Moved Model</button>
         <div>
           <label>
             Grid Size:

@@ -8,7 +8,7 @@
   justify-content: center;
   align-items: center;
   display: flex;
-  background: rgb(171, 225, 22);
+  background: rgb(249, 250, 248);
   height: 76vh;
 
   border-radius: .4rem;
@@ -54,4 +54,14 @@ body{
 .grid{
   color: #1409f0;
   
+}
+.buttonAdd{
+  color: white;
+  background-color: green;
+  left: 50px;
+  top: 20px;
+}
+.buttonRotate{
+  color: white;
+  background-color: green;
 }
