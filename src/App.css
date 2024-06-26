@@ -8,7 +8,7 @@
 body{
   margin: 0;
   padding: 0;
-  background: rgb(171, 225, 22);
+  background: rgb(248, 248, 246);
   overflow: hidden;
 }
 .buttonPos{
@@ -18,4 +18,5 @@ body{
 }
 .grid{
   color: #1409f0;
+  
 }

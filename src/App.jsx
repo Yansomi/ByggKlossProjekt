@@ -14,6 +14,7 @@ function App() {
   const cameraRef = useRef();
   const canvasRef = useRef();
   const trashCornerSize = 20;
+  const modelRefs = useRef({});
   const calculateTrashCornerPosition = (gridSize) => ({
     x: gridSize / 2 + trashCornerSize / 2,
     z: gridSize / 2 + trashCornerSize / 2,
@@ -141,6 +142,7 @@ function App() {
           trashCorner={trashCorner}
           rotation={model.rotation}
           setLastMovedModelId={setLastMovedModelId}
+          modelRefs={modelRefs}
         />
 ))}
         {/* Visualisera sophörnan */}

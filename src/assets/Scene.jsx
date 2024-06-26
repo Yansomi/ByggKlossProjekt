@@ -5,20 +5,30 @@ import scenePath from '../assets/agab_block_1600x800x800-transformed.glb';
 import * as THREE from 'three';
 import { useThree } from '@react-three/fiber';
 
-export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId}) {
+export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs }) {
   const { nodes, materials } = useGLTF(scenePath);
-  const { camera, gl, raycaster, mouse } = useThree();
+  const { camera, gl, raycaster, mouse,scene } = useThree();
   const plane = new THREE.Plane();
-  const planeIntersect = new THREE.Vector3();
+  const planeIntersect = new THREE.Vector3().copy(position);
   const lastPosition = useRef(new THREE.Vector3());
   const allModelsRef = useRef(allModels);
   const trashCornerRef = useRef(trashCorner);
   const dragControlsRef = useRef();
   const groupRef = useRef();
-
+  const selectedModelIds = [];
+  let currentHight = 0;
   useEffect(() => {
     allModelsRef.current = allModels;
   }, [allModels]);
+  useEffect(() => {
+    // Lägg till referens till modelRefs när modellen skapas
+    modelRefs.current[id] = groupRef;
+
+    // Ta bort referensen från modelRefs när komponenten unmountas
+    return () => {
+      delete modelRefs.current[id];
+    };
+  }, [id, modelRefs]);
   
   useEffect(() => {
     trashCornerRef.current = trashCorner;
@@ -37,14 +47,14 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
   const onDrag = (event) => {
     if (!event.object) return;
-
     raycaster.setFromCamera(mouse, camera);
     raycaster.ray.intersectPlane(plane, planeIntersect);
     raycaster.params.Points.threshold = 0.2;
     raycaster.precision = 0.001;
-
     const delta = new THREE.Vector3().subVectors(planeIntersect, lastPosition.current);
     const speed = 1;
+
+    currentHight = groupRef.current.position.y;
 
     const newPosition = new THREE.Vector3().copy(groupRef.current.position).add(delta.multiplyScalar(speed));
 
@@ -54,15 +64,18 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
     const snappedPosition = snapToGrid(newPosition, cellSize, groupRef);
     groupRef.current.position.copy(snappedPosition);
-
-
-    const { snapped, snappedToModelsPosition } = snapToOtherModels(groupRef, allModelsRef.current, id);
-
+    console.log("groupref", groupRef.current.position);
+    const { snapped, snappedToModelsPosition } = snapToOtherModels(groupRef.current, allModelsRef.current, id, selectedModelIds);
+    console.log("snapped", snapped);
+    const worldPosition = new THREE.Vector3();
+    console.log("current hight",currentHight);
     if(!snapped){
-      console.log(snapped);
+      console.log("is not on top")
       snappedToModelsPosition.y = 0;
     }
-    const worldPosition = new THREE.Vector3();
+    else if(snapped && selectedModelIds.length > 1){
+      snappedToModelsPosition.y = currentHight;
+    }
 
     groupRef.current.localToWorld(worldPosition.copy(snappedToModelsPosition));
     groupRef.current.position.copy(snappedToModelsPosition);
@@ -125,10 +138,30 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
   const onDragStart = (event) => {
     if (!event.object) return;
+    // Perform raycasting to find the intersected object
     raycaster.setFromCamera(mouse, camera);
-    plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), groupRef.current.position);
-    raycaster.ray.intersectPlane(plane, planeIntersect);
-    lastPosition.current.copy(planeIntersect);
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    if (intersects.length > 0) {
+      const objectPosition = new THREE.Vector3().setFromMatrixPosition(intersects[0].object.matrixWorld);
+
+      // Align plane with the intersected object
+      plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), objectPosition);
+      raycaster.ray.intersectPlane(plane, planeIntersect);
+      lastPosition.current.copy(planeIntersect);
+
+      const selectedId = intersects;
+      Object.keys(modelRefs.current).forEach((key) => {
+        selectedId.forEach((intersect) => {
+          console.log("current id", modelRefs.current[key].current.id);
+          console.log("intersected id", intersect.object.parent.id);
+          if(modelRefs.current[key].current.id === intersect.object.parent.id && !selectedModelIds.includes(key)){
+            console.log("key id",key );
+            selectedModelIds.push(key);
+          };
+        });
+      });
+    }
   };
 
   const onDragEnd = (event) => {
@@ -137,12 +170,16 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     groupRef.current.position.copy(finalPosition);
     updateModelPosition(id, groupRef.current.position.toArray());
     setLastMovedModelId(id);
+
+    selectedModelIds.forEach((id) => {
+      selectedModelIds.shift();
+    });
+
   };
 
   useEffect(() => {
     if (groupRef.current) {
       const controls = new DragControls([groupRef.current], camera, gl.domElement);
-      console.log("current",groupRef.current);
       controls.addEventListener('drag', onDrag);
       controls.addEventListener('dragstart', onDragStart);
       controls.addEventListener('dragend', onDragEnd);
@@ -300,19 +337,18 @@ function createOBB(position, length, width, height, rotation) {
   return obb;
 }
 
-function snapToOtherModels(groupRef, models, currentModelId) {
-  if (!groupRef.current) {
+function snapToOtherModels(groupRef, models, currentModelId,selectedModelIds) {
+  if (!groupRef) {
     return {snapped: false, snappedToModelsPosition: null}
   }
-  console.log(groupRef.current);
-  const position = new THREE.Vector3();
-  groupRef.current.getWorldPosition(position);
+  const position = new THREE.Vector3().copy(groupRef.position);
+  groupRef.getWorldPosition(position);
   let xOnLenght = false;
   let snapped = false;
-  const onXthreshold = groupRef.current.children[0].scale.x/2;
-  const notOnXthreshold = groupRef.current.children[0].scale.z/2;
-  if(groupRef.current.rotation.y > 3.13 && groupRef.current.children[0].rotation.y < 3.15
-    || groupRef.current.children[0].rotation.y === 0)
+  const onXthreshold = groupRef.children[0].scale.x/2;
+  const notOnXthreshold = groupRef.children[0].scale.z/2;
+  if(groupRef.rotation.y > 3.13 && groupRef.children[0].rotation.y < 3.15
+    || groupRef.children[0].rotation.y === 0)
     {
       xOnLenght = true;
     }
@@ -322,9 +358,13 @@ function snapToOtherModels(groupRef, models, currentModelId) {
     };
   // Snap to height first
   models.forEach((model) => {
-    if (model.id !== currentModelId) {
+    const Id = model.id.toString();
+    console.log("model id", Id);
+    console.log("selected model ids", selectedModelIds);
+    console.log("icludes id", selectedModelIds.includes(Id));
+    if (!selectedModelIds.includes(Id)) {
       const modelPos = new THREE.Vector3(...model.position);
-      const modelHeight = model.hight;
+      const modelHeight = model.hight / 2;
       const modelWidth = model.width / 4;
       const modelLength = model.lenght / 4;
       let isModelRotated = false;
@@ -337,33 +377,42 @@ function snapToOtherModels(groupRef, models, currentModelId) {
         else{
           isModelRotated = false;
         };
+        console.log("other model rotation", isModelRotated);
       if(xOnLenght ===true && isModelRotated === true){
         if (Math.abs(position.x - modelPos.x) < onXthreshold + modelLength && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelWidth) {
-          position.y = modelPos.y + modelHeight / 2 - 0.4;
+          position.y = (modelPos.y + modelHeight) - 0.4;
           snapped =  true;
+          console.log("true true");
+
         }
       }
-      if(xOnLenght === false && isModelRotated === false){
+      else if(xOnLenght === false && isModelRotated === false){
         if (Math.abs(position.x - modelPos.x) < notOnXthreshold + modelWidth && Math.abs(position.z - modelPos.z) < onXthreshold + modelLength) {
-          position.y = modelPos.y + modelHeight / 2 - 0.4;
+          position.y = (modelPos.y + modelHeight)  - 0.4;
           snapped =  true;
+          console.log("false false");
+
         }
       }
-      if(xOnLenght === true && isModelRotated === false){
+      else if(xOnLenght === true && isModelRotated === false){
         if (Math.abs(position.x - modelPos.x) < onXthreshold + modelWidth && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelLength) {
-          position.y = modelPos.y + modelHeight / 2 - 0.4;
+          position.y = (modelPos.y + modelHeight)  - 0.4;
           snapped =  true;
+          console.log("true false");
         }
       }
-      if(xOnLenght === false && isModelRotated === true){
+      else if(xOnLenght === false && isModelRotated === true){
         if (Math.abs(position.x - modelPos.x) < notOnXthreshold + modelLength && Math.abs(position.z - modelPos.z) < onXthreshold + modelWidth) {
-          position.y = modelPos.y + modelHeight / 2 - 0.4;
+          position.y = (modelPos.y + modelHeight)   - 0.4;
           snapped =  true;
+          console.log("false true");
         }
       }
     }
+    if(selectedModelIds.length > 1){
+      snapped = true;
+    }
   });
-
   return {snapped: snapped, snappedToModelsPosition: position};
 }
 
