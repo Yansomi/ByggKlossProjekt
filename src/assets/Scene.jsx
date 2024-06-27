@@ -42,7 +42,6 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     }
   }, [rotation, position]);
 
-  const modelHeight = 1.6;
   const gridBoundary = calculateGridBoundary(gridSize);
 
   const onDrag = (event) => {
@@ -64,13 +63,9 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
     const snappedPosition = snapToGrid(newPosition, cellSize, groupRef);
     groupRef.current.position.copy(snappedPosition);
-    console.log("groupref", groupRef.current.position);
-    const { snapped, snappedToModelsPosition } = snapToOtherModels(groupRef.current, allModelsRef.current, id, selectedModelIds);
-    console.log("snapped", snapped);
+    const { snapped, snappedToModelsPosition } = snapToOtherModels(groupRef.current, allModelsRef.current, currentHight, selectedModelIds);
     const worldPosition = new THREE.Vector3();
-    console.log("current hight",currentHight);
     if(!snapped){
-      console.log("is not on top")
       snappedToModelsPosition.y = 0;
     }
     else if(snapped && selectedModelIds.length > 1){
@@ -114,8 +109,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     const overlapX = Math.max(0, Math.min(box.center.x + box.halfLengths.x, collisionResult.obb.center.x + collisionResult.obb.halfLengths.x) - Math.max(box.center.x - box.halfLengths.x, collisionResult.obb.center.x - collisionResult.obb.halfLengths.x));
     const overlapZ = Math.max(0, Math.min(box.center.z + box.halfLengths.z, collisionResult.obb.center.z + collisionResult.obb.halfLengths.z) - Math.max(box.center.z - box.halfLengths.z, collisionResult.obb.center.z - collisionResult.obb.halfLengths.z));
     
-/*     if (overlapX < overlapZ) {
-      console.log("Collision");
+    if (overlapX < overlapZ) {
       if (event.object.position.x > collisionResult.obb.center.x) {
         snappedToModelsPosition.x += overlapX;
       } else {
@@ -127,9 +121,9 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
       } else {
         snappedToModelsPosition.z -= overlapZ;
       }
-    } */
+    }
   }
-    
+    currentHight = snappedToModelsPosition.y;
     event.object.position.copy(snappedToModelsPosition);
     lastPosition.current.copy(planeIntersect);
     groupRef.current.position.copy(snappedToModelsPosition);
@@ -153,10 +147,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
       const selectedId = intersects;
       Object.keys(modelRefs.current).forEach((key) => {
         selectedId.forEach((intersect) => {
-          console.log("current id", modelRefs.current[key].current.id);
-          console.log("intersected id", intersect.object.parent.id);
           if(modelRefs.current[key].current.id === intersect.object.parent.id && !selectedModelIds.includes(key)){
-            console.log("key id",key );
             selectedModelIds.push(key);
           };
         });
@@ -337,7 +328,7 @@ function createOBB(position, length, width, height, rotation) {
   return obb;
 }
 
-function snapToOtherModels(groupRef, models, currentModelId,selectedModelIds) {
+function snapToOtherModels(groupRef, models, currentHight,selectedModelIds) {
   if (!groupRef) {
     return {snapped: false, snappedToModelsPosition: null}
   }
@@ -359,53 +350,86 @@ function snapToOtherModels(groupRef, models, currentModelId,selectedModelIds) {
   // Snap to height first
   models.forEach((model) => {
     const Id = model.id.toString();
-    console.log("model id", Id);
-    console.log("selected model ids", selectedModelIds);
-    console.log("icludes id", selectedModelIds.includes(Id));
-    if (!selectedModelIds.includes(Id)) {
+
+    let shouldBeonTop = false;
+    let isModelRotated = false;
+    if(currentHight <= model.position[1]){
+      shouldBeonTop = true;
+    }
+    if(model.rotation > 3.13 && model.rotation < 3.15
+      || model.rotation === 0)
+      {
+        isModelRotated = true;
+      }
+  
+      else{
+        isModelRotated = false;
+      };
+
+    if (!selectedModelIds.includes(Id) && shouldBeonTop) {
       const modelPos = new THREE.Vector3(...model.position);
       const modelHeight = model.hight / 2;
       const modelWidth = model.width / 4;
       const modelLength = model.lenght / 4;
-      let isModelRotated = false;
-      if(model.rotation > 3.13 && model.rotation < 3.15
-        || model.rotation === 0)
-        {
-          isModelRotated = true;
-        }
-    
-        else{
-          isModelRotated = false;
-        };
-        console.log("other model rotation", isModelRotated);
       if(xOnLenght ===true && isModelRotated === true){
         if (Math.abs(position.x - modelPos.x) < onXthreshold + modelLength && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelWidth) {
           position.y = (modelPos.y + modelHeight) - 0.4;
           snapped =  true;
-          console.log("true true");
-
         }
       }
       else if(xOnLenght === false && isModelRotated === false){
         if (Math.abs(position.x - modelPos.x) < notOnXthreshold + modelWidth && Math.abs(position.z - modelPos.z) < onXthreshold + modelLength) {
           position.y = (modelPos.y + modelHeight)  - 0.4;
           snapped =  true;
-          console.log("false false");
-
         }
       }
       else if(xOnLenght === true && isModelRotated === false){
         if (Math.abs(position.x - modelPos.x) < onXthreshold + modelWidth && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelLength) {
           position.y = (modelPos.y + modelHeight)  - 0.4;
           snapped =  true;
-          console.log("true false");
         }
       }
       else if(xOnLenght === false && isModelRotated === true){
         if (Math.abs(position.x - modelPos.x) < notOnXthreshold + modelLength && Math.abs(position.z - modelPos.z) < onXthreshold + modelWidth) {
           position.y = (modelPos.y + modelHeight)   - 0.4;
           snapped =  true;
-          console.log("false true");
+        }
+      }
+    }
+    else if(!selectedModelIds.includes(Id) && !snapped){
+      const modelPos = new THREE.Vector3(...model.position);
+      const modelWidth = model.width / 4;
+      const modelLength = model.lenght / 4;
+      let isOnTop = false;
+      if(xOnLenght ===true && isModelRotated === true){
+        if (Math.abs(position.x - modelPos.x) < onXthreshold + modelLength && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelWidth) {
+          position.y = currentHight;
+          snapped =  true;
+          isOnTop = true;
+        }
+      }
+      else if(xOnLenght === false && isModelRotated === false){
+        if (Math.abs(position.x - modelPos.x) < notOnXthreshold + modelWidth && Math.abs(position.z - modelPos.z) < onXthreshold + modelLength) {
+          snapped =  true;
+          isOnTop = true;
+          position.y = currentHight;
+        }
+      }
+      else if(xOnLenght === true && isModelRotated === false){
+        if (Math.abs(position.x - modelPos.x) < onXthreshold + modelWidth && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelLength) {
+          snapped =  true;
+          isOnTop = true;
+          position.y = currentHight;
+        }
+      }
+      else if(xOnLenght === false && isModelRotated === true){
+        if (Math.abs(position.x - modelPos.x) < notOnXthreshold + modelLength && Math.abs(position.z - modelPos.z) < onXthreshold + modelWidth) {
+          snapped =  true;
+          isOnTop = true;
+          position.y = currentHight;
+        }
+        else if(!isOnTop){
+          position.y = 0;
         }
       }
     }
