@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { Canvas } from '@react-three/fiber';
 import { Model } from '../src/assets/Scene';
-import { OrbitControls, Grid } from '@react-three/drei';
+import { OrbitControls, Grid, Text } from '@react-three/drei';
 import { MOUSE } from 'three';
 import * as THREE from 'three';
 
@@ -11,10 +11,12 @@ function App() {
   const [gridSize, setGridSize] = useState(100);
   const [cellSize, setCellSize] = useState(3.2);
   const [lastMovedModelId, setLastMovedModelId] = useState(null);
-  const cameraRef = useRef();
   const canvasRef = useRef();
   const trashCornerSize = 20;
   const modelRefs = useRef({});
+  const [numberOfBlocks, setBlocksnumber] = useState(0);
+  const [pris, setPris] = useState(0);
+  const blockPris = 10;
   const calculateTrashCornerPosition = (gridSize) => ({
     x: gridSize / 2 + trashCornerSize / 2,
     z: gridSize / 2 + trashCornerSize / 2,
@@ -28,9 +30,13 @@ function App() {
   }, [gridSize]);
 
   const addModel = () => {
+    let newPrice = pris + blockPris
+    setPris(newPrice);
+    let newNumber = numberOfBlocks + 1;
+    setBlocksnumber(newNumber);
     setModels((prevModels) => {
       const newId = prevModels.length ? prevModels[prevModels.length - 1].id + 1 : 1;
-      const initialPosition = [0, 0, 0]; // Set an appropriate initial position
+      const initialPosition = [-gridSize/2, 0, -gridSize/2]; // Set an appropriate initial position
       const newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2 };
       return [...prevModels, newModel];
     });
@@ -58,9 +64,14 @@ function App() {
     });
   
   };
+
   
 
   const removeModel = (id) => {
+    let newPrice = pris - blockPris
+    setPris(newPrice);
+    let newNumber = numberOfBlocks - 1;
+    setBlocksnumber(newNumber);
     setModels((prevModels) => prevModels.filter((model) => model.id !== id));
   };
 
@@ -101,24 +112,31 @@ function App() {
 
   return (
     <>
-      <div >
-        <button className='buttonAdd' onClick={addModel}>Add Model</button>
-        <button className='buttonRotate' onClick={rotateModel}>Rotate Last Moved Model</button>
+      <div className='sidePanel'>
+{/*         <button type="button" class="btn btn-dark" onClick={addModel}>Add Model</button>
+        <button className='buttonRotate' onClick={rotateModel}>Rotate Last Moved Model</button>  */}
         <div>
-          <label>
+          <label className='gridSize'>
             Grid Size:
-            <input type="number" value={gridSize} onChange={handleGridSizeChange} />
+            <input  type="number" value={gridSize} onChange={handleGridSizeChange} />
           </label>
         </div>
-        <div>
-          <label>
+        <div className='modelCounter'>
+          <label>Blocks:{numberOfBlocks}</label>
+        </div>
+        <div className='price'>
+        <label >Pris:{pris}</label>
+        </div>
+      <div>
+{/*           <label>
             Cell Size:
             <input type="number" value={cellSize} onChange={handleCellSizeChange} />
-          </label>
+          </label> */}
         </div>
       </div>
-      <Canvas ref={canvasRef} camera={{ fov: 90, near: 0.1, far: 2000, position: [50, 10, 10] }}>
+      <Canvas ref={canvasRef} camera={{ fov: 60, near: 0.1, far: 2000, position: [50, 10, 10] }}>
         <Grid position={[0, 0, 0]} rel="grid" args={[gridSize, gridSize]} cellSize={cellSize} lineWidth={1} />
+        <GridLabels gridSize={gridSize} />
         <OrbitControls
           panSpeed={7}
           zoomSpeed={5}
@@ -158,3 +176,20 @@ function App() {
 export default App;
 
 
+function GridLabels({ gridSize }) {
+  const labels = [];
+  const step = gridSize / 10; // Justera steget efter behov
+
+  for (let i = -gridSize / 2; i <= gridSize / 2; i += step) {
+    labels.push(
+      <Text key={`x-${i}`} position={[i, 0, -gridSize / 2 - 2]} fontSize={1} color="black">
+        {i}
+      </Text>,
+      <Text key={`z-${i}`} position={[-gridSize / 2 - 2, 0, i]} fontSize={1} color="black" rotation={[0, Math.PI / 2, 0]}>
+        {i}
+      </Text>
+    );
+  }
+
+  return <>{labels}</>;
+}

@@ -58,10 +58,41 @@ body{
 .buttonAdd{
   color: white;
   background-color: green;
-  left: 50px;
-  top: 20px;
+  position: relative;
+  left: 80px;
+  top: 10px;
 }
 .buttonRotate{
   color: white;
+  position: relative;
   background-color: green;
+  left: 40px;
+  top: 20px;
+}
+.gridSize{
+  position: relative;
+  left: 10px;
+  top: 30px;
+}
+.sidePanel{
+  background-color: rgb(223, 39, 7);
+  width: 380px;
+  height: 400px;
+  border-radius: 25px;
+  outline: auto;
+  outline-style: inset;
+  outline-width: 20px;
+  outline-color: rgb(55, 218, 14);
+  outline-color: rgb(238, 228, 30);
+}
+.modelCounter{
+  position: relative;
+  left: 10px;
+  top: 30px;
+  
+}
+.price{
+  position: relative;
+  left: 20px;
+  top: 30px;
 }
