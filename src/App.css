@@ -33,6 +33,43 @@ body{
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.699);
   background-image: url(./src/assets/agabbackdrop.jpg);
   padding-inline: 1rem;
+  
+  .header-items {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+    .header-items-left {
+      width: fit-content;
+      display: flex;
+      align-items: center;
+      color: white;
+      text-shadow: 1px 2px 4px rgb(0, 0, 0), 1px 1px 4px black;
+      gap: 1.2rem;
+    }
+
+    .header-items-right {
+      width: 80%;
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      color: rgb(255, 255, 255);
+      font-size: larger;
+      text-shadow: 1px 2px 4px rgb(0, 0, 0), 1px 1px 4px black;
+    }
+  }
+}
+.header-link {
+  cursor: pointer;
+}
+.header-text {
+  cursor: pointer;
+}
+.header-link:hover {
+  color: rgb(255, 97, 97);
+}
+.header-text:hover {
+  color: rgb(255, 97, 97);
 }
 .backdrop {
   position: absolute;
@@ -43,8 +80,8 @@ body{
 
 }
 .logo:hover {
-  background-color: rgba(245, 245, 245, 0.178);
-  border-radius: 1rem;
+  background-color: rgba(255, 255, 255, 0.116);
+  border-radius: 50%;
 }
 .buttonPos{
   position: relative;
