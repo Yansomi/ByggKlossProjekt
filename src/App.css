@@ -38,6 +38,7 @@ body{
     width: 100%;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 
     .header-items-left {
       width: fit-content;
@@ -49,13 +50,16 @@ body{
     }
 
     .header-items-right {
-      width: 80%;
+      width: 55%;
       display: flex;
       justify-content: space-evenly;
       align-items: center;
       color: rgb(255, 255, 255);
       font-size: larger;
       text-shadow: 1px 2px 4px rgb(0, 0, 0), 1px 1px 4px black;
+      border-radius: 2rem;
+      height: 2rem;
+      margin-right: 20rem;
     }
   }
 }
@@ -83,12 +87,25 @@ body{
   position: absolute;
   min-width: 8rem;
   max-width: fit-content;
-  background-color: rgba(255, 255, 255, 0.397);
+  background-color: rgb(255, 255, 255);
   border-radius: .5rem;
-  margin-top: 2rem;
-  padding-inline:.4rem;
+  margin-top: 1.8rem;
+  padding:.4rem;
   font-size: .8rem;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.171);
+  text-shadow: none;
+  color: rgba(0, 0, 0, 0.596);
+  font-weight: 600;
+}
+.dropdown-item-text {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.315);
+  margin: .2rem;
+  cursor: pointer;
+
+
+}
+.dropdown-item-text:hover {
+  color: rgb(230, 102, 64);
 }
 #h-1:hover #d-1{
   display: flex;
@@ -106,6 +123,26 @@ body{
   justify-content: center;
 }
 #h-4:hover #d-4{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+#d-1:hover #d-1{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+#d-2:hover #d-2{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+#d-3:hover #d-3{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+#d-4:hover #d-4{
   display: flex;
   flex-direction: column;
   justify-content: center;
