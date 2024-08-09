@@ -21,9 +21,7 @@ body{
   margin: 0;
   padding: 0;
   background: rgb(255, 255, 255);
-  overflow: hidden;
 }
-
 .header {
   display: flex;
   padding: .5rem;
@@ -32,6 +30,7 @@ body{
   background-size: 100%;
   background-image: url(./src/assets/agabbackdrop.jpg);
   padding-inline: 1rem;
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   
   .header-items {
     height: 7rem;
@@ -71,6 +70,7 @@ body{
 }
 .header-text {
   cursor: pointer;
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 .header-link:hover {
   color:rgb(222, 222, 222);
@@ -155,6 +155,47 @@ body{
 .logo:hover {
   background-color: rgba(255, 255, 255, 0.116);
   border-radius: 50%;
+}
+
+.footer {
+  margin-inline: 8rem;
+  margin-bottom: 1rem;
+  border-top: 2px  rgba(0, 0, 0, 0.4) solid;
+  border-bottom: 2px rgba(0,0,0,0.4) solid;
+  border-radius: 2px;
+  height: fit-content;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  .footer-items {
+    padding: 2rem;
+    padding-top: 2rem;
+    padding-inline: 4rem;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 0.6);
+    .footer-items-left {
+      display: flex;
+      flex-direction: column;
+
+    }
+    .footer-items-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-top: 2rem;
+      margin-right: 6rem;
+      gap: 1rem;
+    }
+  }
+}
+#socIcon {
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
 }
 .buttonPos{
   position: relative;
