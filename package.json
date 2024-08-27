@@ -12,12 +12,12 @@
   "dependencies": {
     "@react-three/drei": "^9.105.6",
     "@react-three/fiber": "^8.16.6",
+    "bootswatch": "^5.3.3",
     "gltfjsx": "^6.2.16",
     "lil-gui": "^0.19.2",
     "next": "^14.2.4",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "three": "^0.164.1"
+    "three": "^0.164.1",
+    "webpack": "^5.92.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
