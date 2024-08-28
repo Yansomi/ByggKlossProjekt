@@ -6,7 +6,7 @@ import { OrbitControls, Grid, Text } from '@react-three/drei';
 import { MOUSE } from 'three';
 import * as THREE from 'three';
 
-function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath}) {
+function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material}) {
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersect = new THREE.Vector3();
   useFrame(({ camera }) => {
@@ -17,7 +17,7 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
       if (planeIntersect) {
         const newPosition = planeIntersect;
         console.log("newPosition", newPosition);
-        setTempModel((prevTempModel) => ({ ...prevTempModel, id: tempModel.id, position: [newPosition.x, 0, newPosition.z], rotation: 0, hight: 3.2, width: 1.6, lenght: 3.2, glbPath:glbPath}));
+        setTempModel((prevTempModel) => ({ ...prevTempModel, id: tempModel.id, position: [newPosition.x, 0, newPosition.z], rotation: 0, hight: 3.2, width: 1.6, lenght: 3.2, glbPath:glbPath, geometry:geometry, material:material}));
       }
     }
   });
@@ -38,6 +38,8 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
       modelRefs={modelRefs}
       canvasRef={canvasRef}
       glbPath={glbPath}
+      geometry={geometry}
+      material={material}
     />
   ) : null;
 }
@@ -72,7 +74,7 @@ function App() {
     setIsPlacingModel(true);
     const newId = models.length ? models[models.length - 1].id + 1 : 1;
     const initialPosition = [0, 0, 0]; // Set an appropriate initial position
-    const newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2, glbPath:'/src/assets/1600x800x800-transformed.glb' };
+    const newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2, glbPath:'/src/assets/1600x800x800-transformed.glb', geometry:'800x800x400', material:'800x800x400'};
     setTempModel(newModel);
   };
   const handleMouseMove = useCallback((event) => {
@@ -240,6 +242,8 @@ function App() {
           modelRefs={modelRefs}
           canvasRef={canvasRef}
           glbPath={model.glbPath}
+          geometry={model.geometry}
+          material={model.material}
         />
 ))}
 {isPlacingModel && (
@@ -263,6 +267,8 @@ function App() {
             modelRefs={modelRefs}
             canvasRef={canvasRef}
             glbPath={tempModel.glbPath}
+            geometry={tempModel.geometry}
+            material={tempModel.material}
           />
         )}
         {/* Visualisera sophörnan */}

@@ -4,7 +4,7 @@ import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 let glbPath1;
-export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs, canvasRef , glbPath }) {
+export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs, canvasRef , glbPath, geometry, material }) {
   glbPath1 = glbPath;
   const { nodes, materials } = useGLTF(glbPath1);
   const { gl, raycaster,scene, camera } = useThree();
@@ -19,8 +19,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
   const cameraRef = useRef();
   const mouse = useRef(new THREE.Vector2());
   let currentHight = 0;
-  console.log(glbPath);
-  //console.log("scenepath: ",scenePath);
+  console.log(material, geometry);
   useEffect(() => {
     allModelsRef.current = allModels;
   }, [allModels]);
@@ -214,7 +213,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
   return (
     <group ref={groupRef}>
-      <mesh geometry={nodes.Plane.geometry} material={materials['Material.001']} scale={modelScale(allModelsRef,id)} />
+      <mesh geometry={nodes[geometry].geometry} material={nodes[material].material} scale={modelScale(allModelsRef,id)} />
     </group>
   );
 }
