@@ -1,22 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
-import scenePath from '../assets/agab_block_1600x800x800-transformed.glb';
 import * as THREE from 'three';
-import { useThree } from '@react-three/fiber';
-
-export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs }) {
-  const { nodes, materials } = useGLTF(scenePath);
-  const { camera, gl, raycaster, mouse,scene } = useThree();
-  const plane = new THREE.Plane();
-  const planeIntersect = new THREE.Vector3().copy(position);
+import { useFrame, useThree } from '@react-three/fiber';
+let glbPath1;
+export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs, canvasRef , glbPath, geometry, material }) {
+  glbPath1 = glbPath;
+  const { nodes, materials } = useGLTF(glbPath1);
+  const { gl, raycaster,scene, camera } = useThree();
+  const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  const planeIntersect = new THREE.Vector3();
   const lastPosition = useRef(new THREE.Vector3());
   const allModelsRef = useRef(allModels);
   const trashCornerRef = useRef(trashCorner);
   const dragControlsRef = useRef();
   const groupRef = useRef();
   const selectedModelIds = [];
+  const cameraRef = useRef();
+  const mouse = useRef(new THREE.Vector2());
   let currentHight = 0;
+  console.log(material, geometry);
   useEffect(() => {
     allModelsRef.current = allModels;
   }, [allModels]);
@@ -44,18 +47,20 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
   const gridBoundary = calculateGridBoundary(gridSize);
 
+  useFrame(({ camera  }) => {
+    cameraRef.current = camera
+  });
+
   const onDrag = (event) => {
     if (!event.object) return;
-    raycaster.setFromCamera(mouse, camera);
+    raycaster.setFromCamera(mouse.current, cameraRef.current);
     raycaster.ray.intersectPlane(plane, planeIntersect);
-    raycaster.params.Points.threshold = 0.2;
-    raycaster.precision = 0.001;
-    const delta = new THREE.Vector3().subVectors(planeIntersect, lastPosition.current);
-    const speed = 1;
-
+    /* raycaster.params.Points.threshold = 0.2;
+    raycaster.precision = 0.001; */
+    console.log("planeinstersect",planeIntersect);
     currentHight = groupRef.current.position.y;
 
-    const newPosition = new THREE.Vector3().copy(groupRef.current.position).add(delta.multiplyScalar(speed));
+    const newPosition = new THREE.Vector3().copy(planeIntersect);
 
     newPosition.x = THREE.MathUtils.clamp(newPosition.x, gridBoundary.minX, gridBoundary.maxX + 10);
     newPosition.z = THREE.MathUtils.clamp(newPosition.z, gridBoundary.minZ, gridBoundary.maxZ + 10);
@@ -88,7 +93,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
       removeModel(id);
       return;
     }
-    const position = new THREE.Vector3();
+/*     const position = new THREE.Vector3();
     groupRef.current.getWorldPosition(position);
     
     const halfLengths = new THREE.Vector3(
@@ -101,11 +106,11 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
       center: position,
       halfLengths: halfLengths,
       rotationMatrix: new THREE.Matrix4().makeRotationY(groupRef.current.rotation.y)
-    };
-    const collisionResult = detectCollision(box, allModels, id);
+    }; */
+    // const collisionResult = detectCollision(box, allModels, id);
 
   // Check for collision and adjust position
-  if (collisionResult.overlap) {
+/*   if (collisionResult.overlap) {
     const overlapX = Math.max(0, Math.min(box.center.x + box.halfLengths.x, collisionResult.obb.center.x + collisionResult.obb.halfLengths.x) - Math.max(box.center.x - box.halfLengths.x, collisionResult.obb.center.x - collisionResult.obb.halfLengths.x));
     const overlapZ = Math.max(0, Math.min(box.center.z + box.halfLengths.z, collisionResult.obb.center.z + collisionResult.obb.halfLengths.z) - Math.max(box.center.z - box.halfLengths.z, collisionResult.obb.center.z - collisionResult.obb.halfLengths.z));
     
@@ -122,18 +127,19 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
         snappedToModelsPosition.z -= overlapZ;
       }
     }
-  }
+  } */
     currentHight = snappedToModelsPosition.y;
     event.object.position.copy(snappedToModelsPosition);
     lastPosition.current.copy(planeIntersect);
     groupRef.current.position.copy(snappedToModelsPosition);
     updateModelPosition(id, groupRef.current.position.toArray());
+    console.log("current pos", groupRef.current.position);
   };
 
   const onDragStart = (event) => {
     if (!event.object) return;
     // Perform raycasting to find the intersected object
-    raycaster.setFromCamera(mouse, camera);
+    raycaster.setFromCamera(mouse.current, cameraRef.current);
     const intersects = raycaster.intersectObjects(scene.children, true);
 
     if (intersects.length > 0) {
@@ -157,9 +163,9 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
   const onDragEnd = (event) => {
     if (!event.object) return;
-    const finalPosition = snapToGrid(groupRef.current.position, cellSize,groupRef);
-    groupRef.current.position.copy(finalPosition);
-    updateModelPosition(id, groupRef.current.position.toArray());
+    /* const finalPosition = snapToGrid(groupRef.current.position, cellSize,groupRef);
+    groupRef.current.position.copy(finalPosition); */
+    /* updateModelPosition(id, groupRef.current.position.toArray()); */
     setLastMovedModelId(id);
 
     selectedModelIds.forEach((id) => {
@@ -184,30 +190,35 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
         controls.dispose();
       };
     }
-  }, [camera, gl, groupRef, raycaster, mouse]);
+  }, [cameraRef, gl, groupRef, raycaster, mouse]);
+
+  const handlePointerMove = (event) => {
+    const canvasBounds = canvasRef.current.getBoundingClientRect();
+    mouse.current.x = ((event.clientX - canvasBounds.left) / canvasBounds.width) * 2 - 1;
+    mouse.current.y = -((event.clientY - canvasBounds.top) / canvasBounds.height) * 2 + 1;
+  };
 
   useEffect(() => {
-    const handlePointerMove = (event) => {
+/*     const handlePointerMove = (event) => {
       const rect = gl.domElement.getBoundingClientRect();
-      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    };
-
+      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    }; */
     gl.domElement.addEventListener('pointermove', handlePointerMove);
 
     return () => {
       gl.domElement.removeEventListener('pointermove', handlePointerMove);
     };
-  }, [gl.domElement, mouse]);
+  }, [canvasRef, mouse]);
 
   return (
     <group ref={groupRef}>
-      <mesh geometry={nodes.Plane.geometry} material={materials['Material.001']} scale={modelScale(allModelsRef,id)} />
+      <mesh geometry={nodes[geometry].geometry} material={nodes[material].material} scale={modelScale(allModelsRef,id)} />
     </group>
   );
 }
 
-useGLTF.preload(scenePath);
+useGLTF.preload(glbPath1);
 
 
 function calculateGridBoundary(gridSize) {
@@ -255,6 +266,8 @@ function snapToGrid(position, cellSize,groupRef) {
     snappedPosition.x = Math.round(snappedPosition.x / (cellSize / 4) ) * (cellSize / 4) ;
     snappedPosition.z = Math.round(snappedPosition.z / (cellSize / 4)) * (cellSize / 4) ;
   }
+  snappedPosition.x = snappedPosition.x / 2;
+  snappedPosition.z = snappedPosition.z / 2;
   return snappedPosition;
 }
 function detectCollision(box, models, currentModelId) {
