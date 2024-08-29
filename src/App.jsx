@@ -70,11 +70,21 @@ function App() {
     setTrashCorner(calculateTrashCornerPosition(gridSize));
   }, [gridSize]);
 
-  const addModel = () => {
+  const addModel = (block) => {
     setIsPlacingModel(true);
     const newId = models.length ? models[models.length - 1].id + 1 : 1;
     const initialPosition = [0, 0, 0]; // Set an appropriate initial position
-    const newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2, glbPath:'/src/assets/1600x800x800-transformed.glb', geometry:'800x800x400', material:'800x800x400'};
+    let newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2, glbPath:'', geometry:'800x800x400', material:''};
+    if(block == 0){
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2, glbPath:'/src/assets/1600x800x800-transformed.glb', geometry:'800x800x400', material:'800x800x400'};
+    }
+    if(block == 1){
+      console.log("using 1");
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2, glbPath:'/src/assets/800x800x800-transformed.glb', geometry:'800x800x400', material:'800x800x400'};
+    }
+    else{
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2, glbPath:'/src/assets/1600x800x800-transformed.glb', geometry:'800x800x400', material:'800x800x400'};
+    }
     setTempModel(newModel);
   };
   const handleMouseMove = useCallback((event) => {
@@ -176,20 +186,20 @@ function App() {
   
 
   return (
+    <div className='canvasBody'>
     <>
-      <div className='sidePanel'>
-{/*         <button type="button" class="btn btn-dark" onClick={addModel}>Add Model</button> */}
-        <button className='buttonRotate' onClick={rotateModel}>Rotate Last Moved Model</button> 
-        <div className="dropdown">
+  <div className='buttonBody'>
+            <button className='buttonRotate' onClick={rotateModel}>Rotate Last Moved Model</button> 
+      <div className="dropdown">
          <div className="btn-group" role="group" aria-label="Button group with nested dropdown">
-         <button type="button" className="btn btn-success">Blocks</button>
+          <button type="button" className="btn btn-success">Blocks</button>
           <div className="btn-group" role="group">
             <button id="btnGroupDrop2" type="button" className="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
               <div className="dropdown-content">
-              <button type="button" className="btn btn-outline-dark" onClick={addModel}>Add Block</button>
-              <button type="button" className="btn btn-outline-dark" onClick={addModel}>Add Block</button>
-              <button type="button" className="btn btn-outline-dark" onClick={addModel}>Add Block</button>
-              <button type="button" className="btn btn-outline-dark" onClick={addModel}>Add Block</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(0)}>Add Block</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(1)}>test Block</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(0)}>Add Block</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(0)}>Add Block</button>
             </div>
           </div>
         </div>
@@ -204,16 +214,10 @@ function App() {
           <label>Blocks:{numberOfBlocks}</label>
         </div>
         <div className='price'>
-        <label >Pris:{pris}</label>
+          <label >Pris:{pris}</label>
         </div>
-      <div>
-{/*           <label>
-            Cell Size:
-            <input type="number" value={cellSize} onChange={handleCellSizeChange} />
-          </label> */}
-        </div>
-      </div>
-      <Canvas ref={canvasRef} camera={{ fov: 60, near: 0.1, far: 2000, position: [50, 10, 10] }}>
+  </div>
+      <Canvas className='canvas' ref={canvasRef} camera={{ fov: 60, near: 0.1, far: 2000, position: [50, 10, 10] }}>
         <Grid position={[0, 0, 0]} rel="grid" args={[gridSize, gridSize]} cellSize={cellSize} lineWidth={1} />
         <GridLabels gridSize={gridSize} />
         <OrbitControls
@@ -278,7 +282,8 @@ function App() {
         </mesh>
       </Canvas>
     </>
-  );
+  
+    </div>);
 }
 
 export default App;

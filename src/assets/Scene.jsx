@@ -19,7 +19,6 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
   const cameraRef = useRef();
   const mouse = useRef(new THREE.Vector2());
   let currentHight = 0;
-  console.log(material, geometry);
   useEffect(() => {
     allModelsRef.current = allModels;
   }, [allModels]);
@@ -57,7 +56,6 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     raycaster.ray.intersectPlane(plane, planeIntersect);
     /* raycaster.params.Points.threshold = 0.2;
     raycaster.precision = 0.001; */
-    console.log("planeinstersect",planeIntersect);
     currentHight = groupRef.current.position.y;
 
     const newPosition = new THREE.Vector3().copy(planeIntersect);
@@ -133,7 +131,6 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     lastPosition.current.copy(planeIntersect);
     groupRef.current.position.copy(snappedToModelsPosition);
     updateModelPosition(id, groupRef.current.position.toArray());
-    console.log("current pos", groupRef.current.position);
   };
 
   const onDragStart = (event) => {

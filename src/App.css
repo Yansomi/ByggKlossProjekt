@@ -22,6 +22,7 @@ body{
   padding: 0;
   background: rgb(255, 255, 255);
   overflow: hidden;
+  width: 100%;
 }
 
 .header {
@@ -66,15 +67,19 @@ body{
   color: white;
   position: relative;
   background-color: green;
-  left: 40px;
-  top: 10px;
+  width: 180px;
+  height: 60px;
+  left: 890px;
+  top: -75px;
+  text-align-last: center;
 }
 .gridSize{
   position: relative;
-  left: 10px;
-  top: 30px;
+  left: 100px;
+  top: -120px;
+  
 }
-.sidePanel{
+/* .sidePanel{
   background-color: rgb(223, 39, 7);
   width: 380px;
   height: 400px;
@@ -84,17 +89,17 @@ body{
   outline-width: 20px;
   outline-color: rgb(55, 218, 14);
   outline-color: rgb(238, 228, 30);
-}
+} */
 .modelCounter{
   position: relative;
-  left: 10px;
-  top: 30px;
+  left: 600px;
+  top: -146px;
   
 }
 .price{
   position: relative;
-  left: 20px;
-  top: 30px;
+  left: 500px;
+  top: -170px;
 }
 .dropdown-content {
   display: none;
@@ -110,15 +115,15 @@ body{
   color: white;
   padding: 16px;
   font-size: 16px;
-  top: 10px;
-  left: 20px;
+  top: 50px;
+  left: 10px;
   border: none;
 }
 .dropdown {
   position: inherit;
   display: inline-block;
-  top: 20px;
-  left: 40px;
+  top: -90px;
+  left: 900px;
 }
 /* Change color of dropdown links on hover */
 .dropdown-content a:hover {background-color: #ddd;}
@@ -128,3 +133,27 @@ body{
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {background-color: #3e8e41;}
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.buttonBody {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+.canvasBody {
+  position: relative; /* För att .buttonBody ska kunna positioneras absolut inom denna */
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  
+}
