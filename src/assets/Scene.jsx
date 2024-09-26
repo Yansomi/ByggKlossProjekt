@@ -4,10 +4,13 @@ import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 let glbPath1;
+<<<<<<< Updated upstream
 export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs, canvasRef , glbPath, geometry, material,widthModefier }) {
+=======
+export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs, canvasRef , glbPath, geometry, material}) {
+>>>>>>> Stashed changes
   glbPath1 = glbPath;
   const { nodes, materials } = useGLTF(glbPath1);
-  const { gl, raycaster,scene, camera } = useThree();
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersect = new THREE.Vector3();
   const lastPosition = useRef(new THREE.Vector3());
