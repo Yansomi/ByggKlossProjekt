@@ -80,7 +80,11 @@ function App() {
     let newModel ;
     console.log(block);
     if(block == 1){
+<<<<<<< Updated upstream
      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.4, widthModefier:0.35 , lengthModefier:0.7};
+=======
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.5, widthModefier:0.35 , lengthModefier:0.7};
+>>>>>>> Stashed changes
     }
     if(block == 2){
      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x400-transformed.glb', geometry:'1600x800x400', material:'1600x800x400', higthModefier:0.75, widthModefier:0.35 , lengthModefier:0.7};
@@ -89,7 +93,11 @@ function App() {
      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x400x400-transformed.glb', geometry:'1600x400x400', material:'1600x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.7};
     }
     if(block == 4){
+<<<<<<< Updated upstream
      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.4, widthModefier:0.35 , lengthModefier:0.4};
+=======
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.35 , lengthModefier:0.4};
+>>>>>>> Stashed changes
     }
     if(block == 5){
       newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x400-transformed.glb', geometry:'800x800x400', material:'800x800x400', higthModefier:0.75, widthModefier:0.35 , lengthModefier:0.4};
@@ -139,6 +147,7 @@ function App() {
     setModels((prevModels) => {
       const updatedModels = prevModels.map((model) => {
         if (model.id === id) {
+          console.log("Models position: ", newPosition );
           return { ...model, position: newPosition };
         }
         return model;
@@ -181,6 +190,7 @@ function App() {
 
   const prebuilt1 = () => {
     let preBuilt = [];
+<<<<<<< Updated upstream
     let initialPosition = [-3.2,0,0];
     let block;
     let newId = models.length;
@@ -188,6 +198,17 @@ function App() {
 
       newId += 1;
       block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.4, widthModefier:0.4 , lengthModefier:0.6};
+=======
+    let initialPosition = [-1.6,0,0];
+    let block;
+    let newId = models.length +1;
+    block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.4, widthModefier:0.35 , lengthModefier:0.7};
+    preBuilt.push(block);
+  /*   for(let i = 0;i < 3 ;i++){
+
+      newId += 1;
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.4, widthModefier:0.35 , lengthModefier:0.7};
+>>>>>>> Stashed changes
       preBuilt.push(block);
       initialPosition[0] += 3.2;
     }
@@ -197,13 +218,27 @@ function App() {
       initialPosition[2] = 0.8;
       for(let i = 0;i < 2;i++){
         newId += 1;
+<<<<<<< Updated upstream
         block = { id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.4, widthModefier:0.4 , lengthModefier:0.6};
+=======
+        block = { id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.4, widthModefier:0.35 , lengthModefier:0.7};
+>>>>>>> Stashed changes
         preBuilt.push(block);
         initialPosition[2] += 2.8;
       }
       console.log(initialPosition);
       initialPosition[0] = 5.6;
     }
+<<<<<<< Updated upstream
+=======
+    initialPosition = [-4.8, 1.4, 0]
+    for(let i = 0;i < 4;i++){
+      newId += 1;
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.4, widthModefier:0.35 , lengthModefier:0.7};
+      preBuilt.push(block);
+      initialPosition[0] += 3.2;
+    } */
+>>>>>>> Stashed changes
     setModels((prevModels) => [...prevModels, ...preBuilt]);
   };
 

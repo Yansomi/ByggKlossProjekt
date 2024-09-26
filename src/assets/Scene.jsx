@@ -11,6 +11,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 >>>>>>> Stashed changes
   glbPath1 = glbPath;
   const { nodes, materials } = useGLTF(glbPath1);
+  const { gl, raycaster, camera, scene} = useThree();
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersect = new THREE.Vector3();
   const lastPosition = useRef(new THREE.Vector3());
