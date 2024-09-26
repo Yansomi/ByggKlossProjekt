@@ -4,7 +4,7 @@ import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 let glbPath1;
-export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs, canvasRef , glbPath, geometry, material,widthModefier }) {
+export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs, canvasRef , glbPath, geometry, material,widthModefier,preBuiltSpawn }) {
   glbPath1 = glbPath;
   const { nodes, materials } = useGLTF(glbPath1);
   const { gl, raycaster,scene, camera } = useThree();
@@ -25,7 +25,6 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
   useEffect(() => {
     // Lägg till referens till modelRefs när modellen skapas
     modelRefs.current[id] = groupRef;
-
     // Ta bort referensen från modelRefs när komponenten unmountas
     return () => {
       delete modelRefs.current[id];
@@ -35,6 +34,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
   useEffect(() => {
     trashCornerRef.current = trashCorner;
   }, [trashCorner]);
+
 
   useEffect(() => {
     if (groupRef.current) {
@@ -68,7 +68,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
     const snappedPosition = snapToGrid(newPosition, cellSize, groupRef,widthModefier);
     groupRef.current.position.copy(snappedPosition);
-    const { snapped, snappedToModelsPosition } = snapToOtherModels(id,groupRef.current, allModelsRef.current, currentHight, selectedModelIds);
+    const { snapped, snappedToModelsPosition } = snapToOtherModels(id,groupRef.current, allModelsRef.current, currentHight, selectedModelIds, preBuiltSpawn);
     const worldPosition = new THREE.Vector3();
     if(!snapped){
       snappedToModelsPosition.y = 0;
@@ -83,56 +83,23 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
     const currentTrashCorner = trashCornerRef.current;
 
+
     const isInTrashCorner =
-      worldPosition.x >= currentTrashCorner.x - currentTrashCorner.size / 2 &&
-      worldPosition.x <= currentTrashCorner.x + currentTrashCorner.size / 2 &&
-      worldPosition.z >= currentTrashCorner.z - currentTrashCorner.size / 2 &&
-      worldPosition.z <= currentTrashCorner.z + currentTrashCorner.size / 2;
+    worldPosition.x >= currentTrashCorner.x - currentTrashCorner.size / 2 &&
+    worldPosition.x <= currentTrashCorner.x + currentTrashCorner.size / 2 &&
+    worldPosition.z >= currentTrashCorner.z - currentTrashCorner.size / 2 &&
+    worldPosition.z <= currentTrashCorner.z + currentTrashCorner.size / 2;
 
     if (isInTrashCorner) {
       removeModel(id);
       return;
     }
-/*     const position = new THREE.Vector3();
-    groupRef.current.getWorldPosition(position);
-    
-    const halfLengths = new THREE.Vector3(
-      groupRef.current.children[0].scale.x / 2,
-      groupRef.current.children[0].scale.y / 2,
-      groupRef.current.children[0].scale.z / 2
-    );
 
-    const box = {
-      center: position,
-      halfLengths: halfLengths,
-      rotationMatrix: new THREE.Matrix4().makeRotationY(groupRef.current.rotation.y)
-    }; */
-    // const collisionResult = detectCollision(box, allModels, id);
-
-  // Check for collision and adjust position
-/*   if (collisionResult.overlap) {
-    const overlapX = Math.max(0, Math.min(box.center.x + box.halfLengths.x, collisionResult.obb.center.x + collisionResult.obb.halfLengths.x) - Math.max(box.center.x - box.halfLengths.x, collisionResult.obb.center.x - collisionResult.obb.halfLengths.x));
-    const overlapZ = Math.max(0, Math.min(box.center.z + box.halfLengths.z, collisionResult.obb.center.z + collisionResult.obb.halfLengths.z) - Math.max(box.center.z - box.halfLengths.z, collisionResult.obb.center.z - collisionResult.obb.halfLengths.z));
-    
-    if (overlapX < overlapZ) {
-      if (event.object.position.x > collisionResult.obb.center.x) {
-        snappedToModelsPosition.x += overlapX;
-      } else {
-        snappedToModelsPosition.x -= overlapX;
-      }
-    } else {
-      if (event.object.position.z > collisionResult.obb.center.z) {
-        snappedToModelsPosition.z += overlapZ;
-      } else {
-        snappedToModelsPosition.z -= overlapZ;
-      }
-    }
-  } */
     currentHight = snappedToModelsPosition.y;
     event.object.position.copy(snappedToModelsPosition);
     lastPosition.current.copy(planeIntersect);
     groupRef.current.position.copy(snappedToModelsPosition);
-    updateModelPosition(id, groupRef.current.position.toArray());
+    updateModelPosition(id, groupRef.current.position.toArray(), false);
   };
 
   const onDragStart = (event) => {
@@ -143,6 +110,8 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
     if (intersects.length > 0) {
       const objectPosition = new THREE.Vector3().setFromMatrixPosition(intersects[0].object.matrixWorld);
+
+
 
       // Align plane with the intersected object
       plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), objectPosition);
@@ -270,8 +239,8 @@ function snapToGrid(position, cellSize,groupRef,widthModefier) {
     snappedPosition.x = Math.round(snappedPosition.x / (cellSize / cellDivider) ) * (cellSize / cellDivider) ;
     snappedPosition.z = Math.round(snappedPosition.z / (cellSize / cellDivider)) * (cellSize / cellDivider) ;
   }
-  snappedPosition.x = snappedPosition.x / 2;
-  snappedPosition.z = snappedPosition.z / 2;
+  snappedPosition.x = snappedPosition.x /2;
+  snappedPosition.z = snappedPosition.z /2;
   return snappedPosition;
 }
 function detectCollision(box, models, currentModelId) {
@@ -345,7 +314,7 @@ function createOBB(position, length, width, height, rotation) {
   return obb;
 }
 
-function snapToOtherModels(id,groupRef, models, currentHight,selectedModelIds) {
+function snapToOtherModels(id,groupRef, models, currentHight,selectedModelIds,preBuiltSpawn) {
   if (!groupRef) {
     return {snapped: false, snappedToModelsPosition: null}
   }
@@ -399,7 +368,11 @@ function snapToOtherModels(id,groupRef, models, currentHight,selectedModelIds) {
       const modelHeight = model.higthModefier/2;
       let modelWidth = model.widthModefier;
       let modelLength = model.lengthModefier;
-      console.log(xOnLenght,isModelRotated);
+      if(model.preBuiltSpawn === true){
+        modelPos.x = modelPos.x/2;
+        modelPos.z = modelPos.z/2;
+      }
+    
       if(xOnLenght ===true && isModelRotated === true){
         if (Math.abs(position.x - modelPos.x) < onXthreshold + modelLength && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelWidth) {
           position.y = (modelPos.y + modelHeight) ;
@@ -433,6 +406,10 @@ function snapToOtherModels(id,groupRef, models, currentHight,selectedModelIds) {
       let modelWidth = model.widthModefier;
       let modelLength = model.lengthModefier;
       let isOnTop = false;
+      if(model.preBuiltSpawn === true){
+        modelPos.x = modelPos.x/2;
+        modelPos.z = modelPos.z/2;
+      }
       if(xOnLenght ===true && isModelRotated === true){
         if (Math.abs(position.x - modelPos.x) < onXthreshold + modelLength && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelWidth) {
           position.y = currentHight;

@@ -6,7 +6,7 @@ import { OrbitControls, Grid, Text } from '@react-three/drei';
 import { MOUSE } from 'three';
 import * as THREE from 'three';
 
-function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material,higthModefier,widthModefier,lengthModefier}) {
+function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material,higthModefier,widthModefier,lengthModefier, preBuiltSpawn}) {
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersect = new THREE.Vector3();
   useFrame(({ camera }) => {
@@ -16,7 +16,7 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
 
       if (planeIntersect) {
         const newPosition = planeIntersect;
-        setTempModel((prevTempModel) => ({ ...prevTempModel, id: tempModel.id, position: [newPosition.x, 0, newPosition.z], rotation: 0, hight:tempModel.hight, width:tempModel.width, lenght:tempModel.lenght, glbPath:glbPath, geometry:geometry, material:material, higthModefier:higthModefier, widthModefier:widthModefier , lengthModefier:lengthModefier}));
+        setTempModel((prevTempModel) => ({ ...prevTempModel, id: tempModel.id, position: [newPosition.x, 0, newPosition.z], rotation: 0, hight:tempModel.hight, width:tempModel.width, lenght:tempModel.lenght, glbPath:glbPath, geometry:geometry, material:material, higthModefier:higthModefier, widthModefier:widthModefier , lengthModefier:lengthModefier, preBuiltSpawn:preBuiltSpawn}));
       }
     }
   });
@@ -40,6 +40,7 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
       geometry={geometry}
       material={material}
       widthModefier={tempModel.widthModefier}
+      preBuiltSpawn={tempModel.preBuiltSpawn}
     />
   ) : null;
 }
@@ -80,22 +81,22 @@ function App() {
     let newModel ;
     console.log(block);
     if(block == 1){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.4, widthModefier:0.35 , lengthModefier:0.7};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.7, preBuiltSpawn:false};
     }
     if(block == 2){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x400-transformed.glb', geometry:'1600x800x400', material:'1600x800x400', higthModefier:0.75, widthModefier:0.35 , lengthModefier:0.7};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x400-transformed.glb', geometry:'1600x800x400', material:'1600x800x400', higthModefier:0.75, widthModefier:0.30 , lengthModefier:0.7, preBuiltSpawn:false};
     }
     if(block == 3){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x400x400-transformed.glb', geometry:'1600x400x400', material:'1600x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.7};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x400x400-transformed.glb', geometry:'1600x400x400', material:'1600x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.7, preBuiltSpawn:false};
     }
     if(block == 4){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.4, widthModefier:0.35 , lengthModefier:0.4};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:false};
     }
     if(block == 5){
-      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x400-transformed.glb', geometry:'800x800x400', material:'800x800x400', higthModefier:0.75, widthModefier:0.35 , lengthModefier:0.4};
+      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x400-transformed.glb', geometry:'800x800x400', material:'800x800x400', higthModefier:0.75, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:false};
     }
     if(block == 6){
-      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x400x400-transformed.glb', geometry:'800x400x400', material:'800x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.4};
+      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x400x400-transformed.glb', geometry:'800x400x400', material:'800x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.4, preBuiltSpawn:false};
     }
     setTempModel(newModel);
   };
@@ -134,12 +135,12 @@ function App() {
     setCellSize(Number(event.target.value));
   };
 
-  const updateModelPosition = (id, newPosition) => {
+  const updateModelPosition = (id, newPosition, preBuiltSpawn) => {
   
     setModels((prevModels) => {
       const updatedModels = prevModels.map((model) => {
         if (model.id === id) {
-          return { ...model, position: newPosition };
+          return { ...model, position: newPosition, preBuiltSpawn: preBuiltSpawn};
         }
         return model;
       });
@@ -184,22 +185,24 @@ function App() {
     let initialPosition = [-3.2,0,0];
     let block;
     let newId = models.length;
+    //block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true};
+    //preBuilt.push(block);
     for(let i = 0;i < 3 ;i++){
 
       newId += 1;
-      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.4, widthModefier:0.4 , lengthModefier:0.6};
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true};
       preBuilt.push(block);
       initialPosition[0] += 3.2;
     }
     const rotation = 1.5707963267948966;
-    initialPosition = [-5.6,0,0.8];
+    initialPosition = [-5.6,0,0.4];
     for(let i = 0;i < 2;i++){
       initialPosition[2] = 0.8;
       for(let i = 0;i < 2;i++){
         newId += 1;
-        block = { id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.4, widthModefier:0.4 , lengthModefier:0.6};
+        block = {id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true};
         preBuilt.push(block);
-        initialPosition[2] += 2.8;
+        initialPosition[2] += 3.2;
       }
       console.log(initialPosition);
       initialPosition[0] = 5.6;
@@ -317,6 +320,19 @@ function App() {
         <OrbitControls
           panSpeed={7}
           zoomSpeed={5}
+          rotateSpeed={0.5}
+          minDistance={10}
+          maxDistance={100}
+          onChange={(e) => {
+            const { x, z } = e.target.object.position;
+  
+            // Begränsa x och z positioner så de inte går utanför griden
+            const halfGridSize = gridSize / 2 +50;
+            const { y } = e.target.object.position;
+            e.target.object.position.x = Math.max(-halfGridSize, Math.min(halfGridSize, x));
+            e.target.object.position.z = Math.max(-halfGridSize, Math.min(halfGridSize, z));
+            e.target.object.position.y = Math.max(0, Math.min(100, y));
+          }}
           mouseButtons={{
             MIDDLE: MOUSE.PAN,
             RIGHT: MOUSE.ROTATE,
@@ -343,6 +359,7 @@ function App() {
           geometry={model.geometry}
           material={model.material}
           widthModefier={model.widthModefier}
+          preBuiltSpawn={model.preBuiltSpawn}
         />
 ))}
 {isPlacingModel && (
@@ -371,6 +388,7 @@ function App() {
             higthModefier={tempModel.higthModefier}
             widthModefier={tempModel.widthModefier}
             lengthModefier={tempModel.lengthModefier}
+            preBuiltSpawn={tempModel.preBuiltSpawn}
           />
         )}
         {/* Visualisera sophörnan */}
