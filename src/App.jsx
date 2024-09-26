@@ -6,7 +6,7 @@ import { OrbitControls, Grid, Text } from '@react-three/drei';
 import { MOUSE } from 'three';
 import * as THREE from 'three';
 
-function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material}) {
+function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material,higthModefier,widthModefier,lengthModefier}) {
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersect = new THREE.Vector3();
   useFrame(({ camera }) => {
@@ -16,8 +16,7 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
 
       if (planeIntersect) {
         const newPosition = planeIntersect;
-        console.log("newPosition", newPosition);
-        setTempModel((prevTempModel) => ({ ...prevTempModel, id: tempModel.id, position: [newPosition.x, 0, newPosition.z], rotation: 0, hight: 3.2, width: 1.6, lenght: 3.2, glbPath:glbPath, geometry:geometry, material:material}));
+        setTempModel((prevTempModel) => ({ ...prevTempModel, id: tempModel.id, position: [newPosition.x, 0, newPosition.z], rotation: 0, hight:tempModel.hight, width:tempModel.width, lenght:tempModel.lenght, glbPath:glbPath, geometry:geometry, material:material, higthModefier:higthModefier, widthModefier:widthModefier , lengthModefier:lengthModefier}));
       }
     }
   });
@@ -40,6 +39,7 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
       glbPath={glbPath}
       geometry={geometry}
       material={material}
+      widthModefier={tempModel.widthModefier}
     />
   ) : null;
 }
@@ -59,6 +59,9 @@ function App() {
   const [pris, setPris] = useState(0);
   const mouse = useRef(new THREE.Vector2());
   const blockPris = 10;
+  const [isCtrlPressed, setIsCtrlPressed] = useState(false);
+  const [isRightMouseDown, setIsRightMouseDown] = useState(false);
+
   const calculateTrashCornerPosition = (gridSize) => ({
     x: gridSize / 2 + trashCornerSize / 2,
     z: gridSize / 2 + trashCornerSize / 2,
@@ -74,16 +77,25 @@ function App() {
     setIsPlacingModel(true);
     const newId = models.length ? models[models.length - 1].id + 1 : 1;
     const initialPosition = [0, 0, 0]; // Set an appropriate initial position
-    let newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2, glbPath:'', geometry:'800x800x400', material:''};
-    if(block == 0){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2, glbPath:'/src/assets/1600x800x800-transformed.glb', geometry:'800x800x400', material:'800x800x400'};
-    }
+    let newModel ;
+    console.log(block);
     if(block == 1){
-      console.log("using 1");
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2, glbPath:'/src/assets/800x800x800-transformed.glb', geometry:'800x800x400', material:'800x800x400'};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.4, widthModefier:0.35 , lengthModefier:0.7};
     }
-    else{
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:3.2, width: 1.6, lenght: 3.2, glbPath:'/src/assets/1600x800x800-transformed.glb', geometry:'800x800x400', material:'800x800x400'};
+    if(block == 2){
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x400-transformed.glb', geometry:'1600x800x400', material:'1600x800x400', higthModefier:0.75, widthModefier:0.35 , lengthModefier:0.7};
+    }
+    if(block == 3){
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x400x400-transformed.glb', geometry:'1600x400x400', material:'1600x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.7};
+    }
+    if(block == 4){
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.4, widthModefier:0.35 , lengthModefier:0.4};
+    }
+    if(block == 5){
+      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x400-transformed.glb', geometry:'800x800x400', material:'800x800x400', higthModefier:0.75, widthModefier:0.35 , lengthModefier:0.4};
+    }
+    if(block == 6){
+      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x400x400-transformed.glb', geometry:'800x400x400', material:'800x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.4};
     }
     setTempModel(newModel);
   };
@@ -92,12 +104,10 @@ function App() {
     const rect = canvasRef.current.getBoundingClientRect();
     mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    console.log("mouse",mouse.current.x, mouse.current.y);
   }, [isPlacingModel, tempModel]);
 
   const handleMouseUp = useCallback(() => {
     if (isPlacingModel && tempModel) {
-      console.log("tempModelPos",tempModel.position);
       setModels((prevModels) => [...prevModels, tempModel]);
       setTempModel(null);
       setIsPlacingModel(false);
@@ -109,7 +119,15 @@ function App() {
   }, [isPlacingModel, tempModel, pris, blockPris, numberOfBlocks]);
 
   const handleGridSizeChange = (event) => {
+    if(Number(event.target.value) < 10){
+      setGridSize(20);
+    }
+    else if(Number(event.target.value) > 200){
+      setGridSize(200);
+    }
+    else{
     setGridSize(Number(event.target.value));
+    }
   };
 
   const handleCellSizeChange = (event) => {
@@ -125,7 +143,6 @@ function App() {
         }
         return model;
       });
-
       return updatedModels;
     });
   
@@ -153,6 +170,41 @@ function App() {
         });
       });
     }
+  };
+
+  const addPreBuilt = (number) => {
+    if(number == 1)
+      {
+        prebuilt1();
+      }
+  };
+
+  const prebuilt1 = () => {
+    let preBuilt = [];
+    let initialPosition = [-3.2,0,0];
+    let block;
+    let newId = models.length;
+    for(let i = 0;i < 3 ;i++){
+
+      newId += 1;
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.4, widthModefier:0.4 , lengthModefier:0.6};
+      preBuilt.push(block);
+      initialPosition[0] += 3.2;
+    }
+    const rotation = 1.5707963267948966;
+    initialPosition = [-5.6,0,0.8];
+    for(let i = 0;i < 2;i++){
+      initialPosition[2] = 0.8;
+      for(let i = 0;i < 2;i++){
+        newId += 1;
+        block = { id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.4, widthModefier:0.4 , lengthModefier:0.6};
+        preBuilt.push(block);
+        initialPosition[2] += 2.8;
+      }
+      console.log(initialPosition);
+      initialPosition[0] = 5.6;
+    }
+    setModels((prevModels) => [...prevModels, ...preBuilt]);
   };
 
   const createSpotlights = (gridSize, distance) => {
@@ -183,7 +235,44 @@ function App() {
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, [handleMouseUp, handleMouseMove]);
-  
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Control') {
+        setIsCtrlPressed(true);
+      }
+    };
+
+    const handleKeyUp = (event) => {
+      if (event.key === 'Control') {
+        setIsCtrlPressed(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+
+  }, []);
+  useEffect(() => {
+    const handleMouseDown = (event) => {
+      if (isCtrlPressed && event.button === 2) { // Högerklick (2 = höger musknapp)
+        // Utför rotationen en gång per högerklick
+        rotateModel();
+      }
+    };
+
+    window.addEventListener('mousedown', handleMouseDown);
+
+    return () => {
+      window.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, [isCtrlPressed]);
+
 
   return (
     <div className='canvasBody'>
@@ -196,10 +285,12 @@ function App() {
           <div className="btn-group" role="group">
             <button id="btnGroupDrop2" type="button" className="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
               <div className="dropdown-content">
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(0)}>Add Block</button>
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(1)}>test Block</button>
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(0)}>Add Block</button>
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(0)}>Add Block</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(1)}>1600x800x800</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(2)}>1600x800x400</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(3)}>1600x400x400</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(4)}>800x800x800</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(5)}>800x800x400</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(6)}>800x400x400</button>
             </div>
           </div>
         </div>
@@ -216,6 +307,9 @@ function App() {
         <div className='price'>
           <label >Pris:{pris}</label>
         </div>
+        <div className='prebuiltGroup'>
+        <button type='button' className='preBuilt' onClick={()=> addPreBuilt(1)}>test</button>
+      </div>
   </div>
       <Canvas className='canvas' ref={canvasRef} camera={{ fov: 60, near: 0.1, far: 2000, position: [50, 10, 10] }}>
         <Grid position={[0, 0, 0]} rel="grid" args={[gridSize, gridSize]} cellSize={cellSize} lineWidth={1} />
@@ -248,6 +342,7 @@ function App() {
           glbPath={model.glbPath}
           geometry={model.geometry}
           material={model.material}
+          widthModefier={model.widthModefier}
         />
 ))}
 {isPlacingModel && (
@@ -273,6 +368,9 @@ function App() {
             glbPath={tempModel.glbPath}
             geometry={tempModel.geometry}
             material={tempModel.material}
+            higthModefier={tempModel.higthModefier}
+            widthModefier={tempModel.widthModefier}
+            lengthModefier={tempModel.lengthModefier}
           />
         )}
         {/* Visualisera sophörnan */}
@@ -295,10 +393,10 @@ function GridLabels({ gridSize }) {
 
   for (let i = -gridSize / 2; i <= gridSize / 2; i += step) {
     labels.push(
-      <Text key={`x-${i}`} position={[i, 0, -gridSize / 2 - 2]} fontSize={1} color="black">
+      <Text key={`x-${i + i}`} position={[i, 0, -gridSize / 2 - 2]} fontSize={2} color="black">
         {i}
       </Text>,
-      <Text key={`z-${i}`} position={[-gridSize / 2 - 2, 0, i]} fontSize={1} color="black" rotation={[0, Math.PI / 2, 0]}>
+      <Text key={`z-${i + i}`} position={[-gridSize / 2 - 2, 0, i]} fontSize={2} color="black" rotation={[0, Math.PI / 2, 0]}>
         {i}
       </Text>
     );

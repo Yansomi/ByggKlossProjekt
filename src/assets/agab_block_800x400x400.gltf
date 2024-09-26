@@ -15,12 +15,12 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"1600x800x800"
+			"name":"800x400x400"
 		}
 	],
 	"meshes":[
 		{
-			"name":"Plane.007",
+			"name":"Plane.001",
 			"primitives":[
 				{
 					"attributes":{
@@ -37,68 +37,68 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":980,
+			"count":490,
 			"max":[
-				0.7999886274337769,
-				0.8367245197296143,
-				0.39939674735069275
+				0.3999999463558197,
+				0.4349999725818634,
+				0.19999998807907104
 			],
 			"min":[
-				-0.8000114560127258,
-				1.150369644165039e-05,
-				-0.40060314536094666
+				-0.4000000059604645,
+				0,
+				-0.19999998807907104
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":980,
+			"count":490,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":980,
+			"count":490,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":2688,
+			"count":1344,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":11760,
+			"byteLength":5880,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":11760,
+			"byteLength":5880,
+			"byteOffset":5880,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":3920,
 			"byteOffset":11760,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":7840,
-			"byteOffset":23520,
-			"target":34962
-		},
-		{
-			"buffer":0,
-			"byteLength":5376,
-			"byteOffset":31360,
+			"byteLength":2688,
+			"byteOffset":15680,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":36736,
-			"uri":"agab_block_1600x800x800.bin"
+			"byteLength":18368,
+			"uri":"agab_block_800x400x400.bin"
 		}
 	]
 }
