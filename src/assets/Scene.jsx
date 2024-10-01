@@ -371,6 +371,7 @@ function snapToOtherModels(id,groupRef, models, currentHight,selectedModelIds,pr
       if(model.preBuiltSpawn === true){
         modelPos.x = modelPos.x/2;
         modelPos.z = modelPos.z/2;
+        modelPos.y = modelPos.y/2;
       }
     
       if(xOnLenght ===true && isModelRotated === true){
