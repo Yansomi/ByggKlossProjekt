@@ -47,7 +47,7 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
 
 function App() {
   const [models, setModels] = useState([]);
-  const [gridSize, setGridSize] = useState(100);
+  const [gridSize, setGridSize] = useState(50);
   const [cellSize, setCellSize] = useState(3.2);
   const [lastMovedModelId, setLastMovedModelId] = useState(null);
   const [isPlacingModel, setIsPlacingModel] = useState(false);
@@ -198,13 +198,37 @@ function App() {
     initialPosition = [-5.6,0,0.4];
     for(let i = 0;i < 2;i++){
       initialPosition[2] = 0.8;
+      for(let i = 0;i < 3;i++){
+        newId += 1;
+        block = {id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true};
+        preBuilt.push(block);
+        initialPosition[2] += 3.2;
+      }
+      initialPosition[0] = 5.6;
+    }
+    initialPosition = [-4.8,1.5,0];
+    for(let i= 0;i < 4;i++){
+      newId +=1;
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true};
+      preBuilt.push(block);
+      initialPosition[0] += 3.2;
+    }
+    initialPosition = [-5.6,1.5,0.4];
+    for(let i = 0;i < 2;i++){
+      initialPosition[2] = 2.4;
       for(let i = 0;i < 2;i++){
         newId += 1;
         block = {id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true};
         preBuilt.push(block);
         initialPosition[2] += 3.2;
       }
-      console.log(initialPosition);
+      initialPosition[0] = 5.6;
+    }
+    initialPosition = [-5.6,1.5,8];
+    for(let i = 0;i < 2;i++){
+      newId +=1;
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:true};
+      preBuilt.push(block);
       initialPosition[0] = 5.6;
     }
     setModels((prevModels) => [...prevModels, ...preBuilt]);
