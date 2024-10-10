@@ -59,7 +59,6 @@ function App() {
   const [numberOfBlocks, setBlocksnumber] = useState(0);
   const [pris, setPris] = useState(0);
   const mouse = useRef(new THREE.Vector2());
-  const blockPris = 10;
   const [isCtrlPressed, setIsCtrlPressed] = useState(false);
   const [isRightMouseDown, setIsRightMouseDown] = useState(false);
 
@@ -69,6 +68,9 @@ function App() {
     size: trashCornerSize / 2,
   });
   const [trashCorner, setTrashCorner] = useState(calculateTrashCornerPosition(gridSize));
+  useEffect(() => {
+    blockAndpriceUpdate();
+  }, [models.length]);
 
   useEffect(() => {
     setTrashCorner(calculateTrashCornerPosition(gridSize));
@@ -81,22 +83,22 @@ function App() {
     let newModel ;
     console.log(block);
     if(block == 1){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.7, preBuiltSpawn:false};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.7, preBuiltSpawn:false, price:10};
     }
     if(block == 2){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x400-transformed.glb', geometry:'1600x800x400', material:'1600x800x400', higthModefier:0.75, widthModefier:0.30 , lengthModefier:0.7, preBuiltSpawn:false};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x400-transformed.glb', geometry:'1600x800x400', material:'1600x800x400', higthModefier:0.75, widthModefier:0.30 , lengthModefier:0.7, preBuiltSpawn:false, price:10};
     }
     if(block == 3){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x400x400-transformed.glb', geometry:'1600x400x400', material:'1600x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.7, preBuiltSpawn:false};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x400x400-transformed.glb', geometry:'1600x400x400', material:'1600x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.7, preBuiltSpawn:false, price:10};
     }
     if(block == 4){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:false};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:false, price:10};
     }
     if(block == 5){
-      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x400-transformed.glb', geometry:'800x800x400', material:'800x800x400', higthModefier:0.75, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:false};
+      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x400-transformed.glb', geometry:'800x800x400', material:'800x800x400', higthModefier:0.75, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:false, price:10};
     }
     if(block == 6){
-      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x400x400-transformed.glb', geometry:'800x400x400', material:'800x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.4, preBuiltSpawn:false};
+      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x400x400-transformed.glb', geometry:'800x400x400', material:'800x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.4, preBuiltSpawn:false, price:10};
     }
     setTempModel(newModel);
   };
@@ -112,12 +114,8 @@ function App() {
       setModels((prevModels) => [...prevModels, tempModel]);
       setTempModel(null);
       setIsPlacingModel(false);
-      let newPrice = pris + blockPris;
-      setPris(newPrice);
-      let newNumber = numberOfBlocks + 1;
-      setBlocksnumber(newNumber);
     }
-  }, [isPlacingModel, tempModel, pris, blockPris, numberOfBlocks]);
+  }, [isPlacingModel, tempModel, numberOfBlocks]);
 
   const handleGridSizeChange = (event) => {
     if(Number(event.target.value) < 10){
@@ -152,11 +150,23 @@ function App() {
   
 
   const removeModel = (id) => {
-    let newPrice = pris - blockPris
-    setPris(newPrice);
-    let newNumber = numberOfBlocks - 1;
-    setBlocksnumber(newNumber);
     setModels((prevModels) => prevModels.filter((model) => model.id !== id));
+  };
+
+  const blockAndpriceUpdate = () => {
+    console.log(models);
+    if(models){
+      setBlocksnumber(models.length);
+      let newPrice = 0;
+      for(let i =  0;i < models.length;i++){
+        newPrice += models[i].price;
+      }
+      setPris(newPrice);
+    }
+    else{
+      setBlocksnumber(0);
+      setPris(0);
+    }
   };
 
   const rotateModel = () => {
@@ -185,12 +195,11 @@ function App() {
     let initialPosition = [-3.2,0,0];
     let block;
     let newId = models.length;
-    //block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true};
-    //preBuilt.push(block);
+
     for(let i = 0;i < 3 ;i++){
 
       newId += 1;
-      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true};
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true, price:10};
       preBuilt.push(block);
       initialPosition[0] += 3.2;
     }
@@ -200,7 +209,7 @@ function App() {
       initialPosition[2] = 0.8;
       for(let i = 0;i < 3;i++){
         newId += 1;
-        block = {id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true};
+        block = {id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true, price:10};
         preBuilt.push(block);
         initialPosition[2] += 3.2;
       }
@@ -209,7 +218,7 @@ function App() {
     initialPosition = [-4.8,1.5,0];
     for(let i= 0;i < 4;i++){
       newId +=1;
-      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true};
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true, price:10};
       preBuilt.push(block);
       initialPosition[0] += 3.2;
     }
@@ -218,7 +227,7 @@ function App() {
       initialPosition[2] = 2.4;
       for(let i = 0;i < 2;i++){
         newId += 1;
-        block = {id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true};
+        block = {id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true, price:10};
         preBuilt.push(block);
         initialPosition[2] += 3.2;
       }
@@ -227,7 +236,7 @@ function App() {
     initialPosition = [-5.6,1.5,8];
     for(let i = 0;i < 2;i++){
       newId +=1;
-      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:true};
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:true, price:10};
       preBuilt.push(block);
       initialPosition[0] = 5.6;
     }

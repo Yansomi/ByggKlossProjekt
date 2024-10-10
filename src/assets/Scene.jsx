@@ -18,6 +18,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
   const selectedModelIds = [];
   const cameraRef = useRef();
   const mouse = useRef(new THREE.Vector2());
+  let selectedObj = null;
   let currentHight = 0;
   useEffect(() => {
     allModelsRef.current = allModels;
@@ -52,13 +53,14 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
 
   const onDrag = (event) => {
     if (!event.object) return;
-    raycaster.setFromCamera(mouse.current, cameraRef.current);
+    if (event.object !== selectedObj) return;
+    //raycaster.setFromCamera(mouse.current, cameraRef.current);
     raycaster.ray.intersectPlane(plane, planeIntersect);
     /* raycaster.params.Points.threshold = 0.2;
     raycaster.precision = 0.001; */
     currentHight = groupRef.current.position.y;
 
-    console.log("position: ", groupRef.current.position);
+    //console.log("ondrag event",event.object,"controler",dragControlsRef.current.objects,"raycaster",raycaster.intersectObjects);
 
     const newPosition = new THREE.Vector3().copy(planeIntersect);
 
@@ -76,7 +78,6 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     else if(snapped && selectedModelIds.length > 1){
       snappedToModelsPosition.y = currentHight;
     }
-
     groupRef.current.localToWorld(worldPosition.copy(snappedToModelsPosition));
     groupRef.current.position.copy(snappedToModelsPosition);
 
@@ -100,23 +101,33 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     lastPosition.current.copy(planeIntersect);
     groupRef.current.position.copy(snappedToModelsPosition);
     updateModelPosition(id, groupRef.current.position.toArray(), false);
+    //console.log("dragControls in ondrag",dragControlsRef.current.objects);
   };
 
   const onDragStart = (event) => {
     if (!event.object) return;
     // Perform raycasting to find the intersected object
+
     raycaster.setFromCamera(mouse.current, cameraRef.current);
     const intersects = raycaster.intersectObjects(scene.children, true);
+    console.log("instresects", intersects);
 
     if (intersects.length > 0) {
       const objectPosition = new THREE.Vector3().setFromMatrixPosition(intersects[0].object.matrixWorld);
-
-
 
       // Align plane with the intersected object
       plane.setFromNormalAndCoplanarPoint(camera.getWorldDirection(new THREE.Vector3()), objectPosition);
       raycaster.ray.intersectPlane(plane, planeIntersect);
       lastPosition.current.copy(planeIntersect);
+      selectedObj = intersects[0].object;
+      event.object = intersects[0].object;
+      console.log("selected",selectedObj,"event",event.object,"groupref", groupRef.current);
+      
+          // Uppdatera dragControls till att bara hantera det första träffade objektet
+
+
+      dragControlsRef.current.objects = [selectedObj];
+      console.log("dragControls",dragControlsRef.current);
 
       const selectedId = intersects;
       Object.keys(modelRefs.current).forEach((key) => {
@@ -127,19 +138,17 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
         });
       });
     }
+/*     else{
+      dragControlsRef.current.objects = [];
+    } */
   };
 
   const onDragEnd = (event) => {
     if (!event.object) return;
-    /* const finalPosition = snapToGrid(groupRef.current.position, cellSize,groupRef);
-    groupRef.current.position.copy(finalPosition); */
-    /* updateModelPosition(id, groupRef.current.position.toArray()); */
-    setLastMovedModelId(id);
-
     selectedModelIds.forEach((id) => {
       selectedModelIds.shift();
     });
-
+    setLastMovedModelId(id);
   };
 
   useEffect(() => {
@@ -148,7 +157,6 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
       controls.addEventListener('drag', onDrag);
       controls.addEventListener('dragstart', onDragStart);
       controls.addEventListener('dragend', onDragEnd);
-
       dragControlsRef.current = controls;
 
       return () => {
@@ -167,11 +175,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
   };
 
   useEffect(() => {
-/*     const handlePointerMove = (event) => {
-      const rect = gl.domElement.getBoundingClientRect();
-      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    }; */
+
     gl.domElement.addEventListener('pointermove', handlePointerMove);
 
     return () => {
@@ -398,9 +402,6 @@ function snapToOtherModels(id,groupRef, models, currentHight,selectedModelIds,pr
           snapped =  true;
         }
       }
-     /*  console.log("modelPos:", modelPos, "modelLenght:",modelLength,"modelWith:", modelWidth, "modelHight:", modelHeight);
-      console.log("pos:", position);
-      console.log("mapPos:", position.x - modelPos.x , position.z - modelPos.z); */
     }
     else if(!selectedModelIds.includes(Id) && !snapped){
       const modelPos = new THREE.Vector3(...model.position);
@@ -444,7 +445,7 @@ function snapToOtherModels(id,groupRef, models, currentHight,selectedModelIds,pr
         }
       }
     }
-    if(selectedModelIds.length > 1){
+    if(selectedModelIds.length > 1 ){
       snapped = true;
     }
   });
