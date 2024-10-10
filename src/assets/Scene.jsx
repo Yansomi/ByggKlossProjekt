@@ -151,7 +151,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     setLastMovedModelId(id);
   };
 
-  useEffect(() => {
+/*   useEffect(() => {
     if (groupRef.current) {
       const controls = new DragControls([groupRef.current], camera, gl.domElement);
       controls.addEventListener('drag', onDrag);
@@ -166,22 +166,9 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
         controls.dispose();
       };
     }
-  }, [cameraRef, gl, groupRef, raycaster, mouse]);
+  }, [cameraRef, gl, groupRef, raycaster, mouse]); */
 
-  const handlePointerMove = (event) => {
-    const canvasBounds = canvasRef.current.getBoundingClientRect();
-    mouse.current.x = ((event.clientX - canvasBounds.left) / canvasBounds.width) * 2 - 1;
-    mouse.current.y = -((event.clientY - canvasBounds.top) / canvasBounds.height) * 2 + 1;
-  };
-
-  useEffect(() => {
-
-    gl.domElement.addEventListener('pointermove', handlePointerMove);
-
-    return () => {
-      gl.domElement.removeEventListener('pointermove', handlePointerMove);
-    };
-  }, [canvasRef, mouse]);
+ 
 
   return (
     <group ref={groupRef}>
@@ -227,8 +214,8 @@ function snapToGrid(position, cellSize,groupRef,widthModefier) {
     {
       cellDivider = 8;
     }
-  if(groupRef.current.children[0].rotation.y > 3.13 && groupRef.current.children[0].rotation.y < 3.15
-    || groupRef.current.children[0].rotation.y === 0)
+  if(groupRef.children[0].rotation.y > 3.13 && groupRef.children[0].rotation.y < 3.15
+    || groupRef.children[0].rotation.y === 0)
     {
       xOnLenght = true;
     }
@@ -243,8 +230,8 @@ function snapToGrid(position, cellSize,groupRef,widthModefier) {
     snappedPosition.x = Math.round(snappedPosition.x / (cellSize / cellDivider) ) * (cellSize / cellDivider) ;
     snappedPosition.z = Math.round(snappedPosition.z / (cellSize / cellDivider)) * (cellSize / cellDivider) ;
   }
-  snappedPosition.x = snappedPosition.x /2;
-  snappedPosition.z = snappedPosition.z /2;
+  snappedPosition.x = snappedPosition.x ;
+  snappedPosition.z = snappedPosition.z ;
   return snappedPosition;
 }
 
@@ -281,6 +268,7 @@ function snapToOtherModels(id,groupRef, models, currentHight,selectedModelIds,pr
     };
   // Snap to height first
   models.forEach((model) => {
+    if(model.id === id) return;
     const Id = model.id.toString();
 
     let shouldBeonTop = false;
@@ -300,7 +288,7 @@ function snapToOtherModels(id,groupRef, models, currentHight,selectedModelIds,pr
 
     if (!selectedModelIds.includes(Id) && shouldBeonTop) {
       const modelPos = new THREE.Vector3(...model.position);
-      const modelHeight = model.higthModefier/2;
+      const modelHeight = model.higthModefier;
       let modelWidth = model.widthModefier;
       let modelLength = model.lengthModefier;
       if(model.preBuiltSpawn === true){
@@ -313,6 +301,7 @@ function snapToOtherModels(id,groupRef, models, currentHight,selectedModelIds,pr
         if (Math.abs(position.x - modelPos.x) < onXthreshold + modelLength && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelWidth) {
           position.y = (modelPos.y + modelHeight) ;
           snapped =  true;
+          console.log("körs");
         }
       }
       else if(xOnLenght === false && isModelRotated === false){
@@ -351,7 +340,6 @@ function snapToOtherModels(id,groupRef, models, currentHight,selectedModelIds,pr
         }
       }
       else if(xOnLenght === false && isModelRotated === false){
-        console.log('abs',Math.abs(position.x - modelPos.x))
         if (Math.abs(position.x - modelPos.x) < notOnXthreshold + modelWidth && Math.abs(position.z - modelPos.z) < onXthreshold + modelLength) {
           snapped =  true;
           isOnTop = true;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree  } from '@react-three/fiber';
 import { Model } from '../src/assets/Scene';
 import { OrbitControls, Grid, Text } from '@react-three/drei';
 import { MOUSE } from 'three';
@@ -61,6 +61,8 @@ function App() {
   const mouse = useRef(new THREE.Vector2());
   const [isCtrlPressed, setIsCtrlPressed] = useState(false);
   const [isRightMouseDown, setIsRightMouseDown] = useState(false);
+  const [selectedObjectId, setSelectedObjectId] = useState(null);
+  const cameraRef = useRef();
 
   const calculateTrashCornerPosition = (gridSize) => ({
     x: gridSize / 2 + trashCornerSize / 2,
@@ -83,7 +85,7 @@ function App() {
     let newModel ;
     console.log(block);
     if(block == 1){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.7, preBuiltSpawn:false, price:10};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.5, widthModefier:0.60 , lengthModefier:1.4, preBuiltSpawn:false, price:10};
     }
     if(block == 2){
      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x400-transformed.glb', geometry:'1600x800x400', material:'1600x800x400', higthModefier:0.75, widthModefier:0.30 , lengthModefier:0.7, preBuiltSpawn:false, price:10};
@@ -263,6 +265,41 @@ function App() {
     return spotlights;
   };
 
+  const onMouseDown = (event) => {
+    if (isPlacingModel) return;
+    mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.current.setFromCamera(mouse.current, cameraRef.current);
+    const intersects = raycaster.current.intersectObjects(
+      Object.values(modelRefs.current).map((ref) => ref.current),
+      true
+    );
+
+    if (intersects.length > 0) {
+      console.log("intersect", intersects[0].object.userData.id, models[0].id);
+      setSelectedObjectId(intersects[0].object.userData.id);
+    }
+  };
+
+  const onMouseMove = (event) => {
+    if (!selectedObjectId) return;
+
+    mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.current.setFromCamera(mouse.current, cameraRef.current);
+    raycaster.current.ray.intersectPlane(plane, planeIntersect);
+
+    setModels((prevModels) =>
+      prevModels.map((model) =>
+        model.id === selectedObjectId ? { ...model, position: [planeIntersect.x, planeIntersect.y, planeIntersect.z] } : model
+      )
+    );
+  };
+
+  const onMouseUp = () => setSelectedObjectId(null);
+
   useEffect(() => {
     window.addEventListener('mouseup', handleMouseUp);
     window.addEventListener('mousemove', handleMouseMove);
@@ -287,10 +324,16 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
     };
 
   }, []);
@@ -347,7 +390,14 @@ function App() {
         <button type='button' className='preBuilt' onClick={()=> addPreBuilt(1)}>test</button>
       </div>
   </div>
-      <Canvas className='canvas' ref={canvasRef} camera={{ fov: 60, near: 0.1, far: 2000, position: [50, 10, 10] }}>
+  <Canvas
+        className='canvas'
+        ref={canvasRef}
+        camera={{ fov: 60, near: 0.1, far: 2000, position: [50, 10, 10] }}
+        onCreated={({ camera }) => {
+          cameraRef.current = camera;
+        }}
+      >
         <Grid position={[0, 0, 0]} rel="grid" args={[gridSize, gridSize]} cellSize={cellSize} lineWidth={1} />
         <GridLabels gridSize={gridSize} />
         <OrbitControls
