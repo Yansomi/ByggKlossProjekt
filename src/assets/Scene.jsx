@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
-import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 let glbPath1;
-export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs, canvasRef , glbPath, geometry, material,widthModefier,preBuiltSpawn }) {
+export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs, canvasRef , glbPath, geometry, material,widthModefier,preBuiltSpawn,sceneRef }) {
   glbPath1 = glbPath;
   const { nodes, materials } = useGLTF(glbPath1);
-  const { gl, raycaster,scene, camera } = useThree();
+  const { gl, raycaster, camera, scene } = useThree();
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersect = new THREE.Vector3();
   const lastPosition = useRef(new THREE.Vector3());
@@ -25,10 +24,12 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
   }, [allModels]);
   useEffect(() => {
     // Lägg till referens till modelRefs när modellen skapas
-    modelRefs.current[id] = groupRef;
+    modelRefs.current = groupRef.current;
+    sceneRef.current = scene;
     // Ta bort referensen från modelRefs när komponenten unmountas
+    console.log("modelRef", modelRefs.current);
     return () => {
-      delete modelRefs.current[id];
+      delete modelRefs.current;
     };
   }, [id, modelRefs]);
   
@@ -42,6 +43,8 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
       // Uppdatera modellens position och rotation
       groupRef.current.position.set(...position);
       groupRef.current.children[0].rotation.y = rotation;
+      groupRef.current.userData.id = id;
+      console.log(groupRef.current);
     }
   }, [rotation, position]);
 
@@ -109,7 +112,7 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
     // Perform raycasting to find the intersected object
 
     raycaster.setFromCamera(mouse.current, cameraRef.current);
-    const intersects = raycaster.intersectObjects(scene.children, true);
+    const intersects = raycaster.intersectObjects([groupRef.current], true);
     console.log("instresects", intersects);
 
     if (intersects.length > 0) {

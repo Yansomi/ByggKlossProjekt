@@ -5,8 +5,9 @@ import { Model } from '../src/assets/Scene';
 import { OrbitControls, Grid, Text } from '@react-three/drei';
 import { MOUSE } from 'three';
 import * as THREE from 'three';
+import controller from '../src/controlls';
 
-function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material,higthModefier,widthModefier,lengthModefier, preBuiltSpawn}) {
+function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material,higthModefier,widthModefier,lengthModefier, preBuiltSpawn, sceneRef}) {
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersect = new THREE.Vector3();
   useFrame(({ camera }) => {
@@ -20,7 +21,7 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
       }
     }
   });
-
+  console.log("position spawn", tempModel.position );
   return tempModel ? (
     <Model
       key={tempModel.id}
@@ -41,6 +42,7 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
       material={material}
       widthModefier={tempModel.widthModefier}
       preBuiltSpawn={tempModel.preBuiltSpawn}
+      sceneRef={sceneRef}
     />
   ) : null;
 }
@@ -63,6 +65,7 @@ function App() {
   const [isRightMouseDown, setIsRightMouseDown] = useState(false);
   const [selectedObjectId, setSelectedObjectId] = useState(null);
   const cameraRef = useRef();
+  const sceneRef = useRef();
 
   const calculateTrashCornerPosition = (gridSize) => ({
     x: gridSize / 2 + trashCornerSize / 2,
@@ -135,7 +138,7 @@ function App() {
     setCellSize(Number(event.target.value));
   };
 
-  const updateModelPosition = (id, newPosition, preBuiltSpawn) => {
+  const updateModelPosition = (id, newPosition, preBuiltSpawn ) => {
   
     setModels((prevModels) => {
       const updatedModels = prevModels.map((model) => {
@@ -146,7 +149,6 @@ function App() {
       });
       return updatedModels;
     });
-  
   };
 
   
@@ -265,40 +267,7 @@ function App() {
     return spotlights;
   };
 
-  const onMouseDown = (event) => {
-    if (isPlacingModel) return;
-    mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-    raycaster.current.setFromCamera(mouse.current, cameraRef.current);
-    const intersects = raycaster.current.intersectObjects(
-      Object.values(modelRefs.current).map((ref) => ref.current),
-      true
-    );
-
-    if (intersects.length > 0) {
-      console.log("intersect", intersects[0].object.userData.id, models[0].id);
-      setSelectedObjectId(intersects[0].object.userData.id);
-    }
-  };
-
-  const onMouseMove = (event) => {
-    if (!selectedObjectId) return;
-
-    mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    raycaster.current.setFromCamera(mouse.current, cameraRef.current);
-    raycaster.current.ray.intersectPlane(plane, planeIntersect);
-
-    setModels((prevModels) =>
-      prevModels.map((model) =>
-        model.id === selectedObjectId ? { ...model, position: [planeIntersect.x, planeIntersect.y, planeIntersect.z] } : model
-      )
-    );
-  };
-
-  const onMouseUp = () => setSelectedObjectId(null);
 
   useEffect(() => {
     window.addEventListener('mouseup', handleMouseUp);
@@ -324,16 +293,10 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
-    window.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
     };
 
   }, []);
@@ -443,6 +406,7 @@ function App() {
           material={model.material}
           widthModefier={model.widthModefier}
           preBuiltSpawn={model.preBuiltSpawn}
+          sceneRef={sceneRef}
         />
 ))}
 {isPlacingModel && (
@@ -472,6 +436,7 @@ function App() {
             widthModefier={tempModel.widthModefier}
             lengthModefier={tempModel.lengthModefier}
             preBuiltSpawn={tempModel.preBuiltSpawn}
+            sceneRef={sceneRef}
           />
         )}
         {/* Visualisera sophörnan */}
@@ -479,6 +444,7 @@ function App() {
           <boxGeometry args={[trashCorner.size, 5, trashCorner.size]} />
           <meshBasicMaterial color="red" />
         </mesh>
+        <Controls modelRefs={modelRefs} gridSize={gridSize} canvasRef={canvasRef} cameraRef={cameraRef} updateModelPosition={updateModelPosition}/>
       </Canvas>
     </>
   
@@ -504,4 +470,69 @@ function GridLabels({ gridSize }) {
   }
 
   return <>{labels}</>;
+}
+
+function Controls({ modelRefs, gridSize, canvasRef, cameraRef, updateModelPosition}) {
+  const raycaster = useRef(new THREE.Raycaster());
+  const mouse = useRef(new THREE.Vector2());
+  const selectedObject = useRef(null); // Håll koll på valt objekt
+  const { gl, camera } = useThree();
+  const plane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)); // Ett plan för att "dra" objekt på rätt nivå
+  const planeIntersect = useRef(new THREE.Vector3());
+  const offset = useRef(new THREE.Vector3()); // För att hålla den initiala offseten
+
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      const rect = canvasRef.current.getBoundingClientRect();
+      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      console.log(camera.current);
+      raycaster.current.setFromCamera(mouse.current, camera);
+
+      if (selectedObject.current) {
+        raycaster.current.ray.intersectPlane(plane.current, planeIntersect.current);
+                // Justera positionen med den initiala offseten
+        const newPosition = planeIntersect.current.clone().add(offset.current);
+        //const newPosition = planeIntersect.current;
+        console.log("position after spawn", newPosition);
+        console.log("objekt", selectedObject.current);
+        const controllerPos = controller(newPosition,gridSize);
+        selectedObject.current.position.copy(controllerPos);
+        updateModelPosition(selectedObject.current.userData.id, controllerPos.toArray(),false);
+      }
+    };
+
+    const handleMouseDown = (event) => {
+      if (event.button !== 0) return; // Bara vänsterklick
+
+      raycaster.current.setFromCamera(mouse.current, camera);
+      const objectsToCheck = modelRefs.current.parent.children;
+
+      const intersects = raycaster.current.intersectObjects(objectsToCheck, true);
+
+      if (intersects.length > 0) {
+        selectedObject.current = intersects[0].object.parent; // Markera objektet som ska dras
+
+        // Beräkna offset mellan musen och objektets position
+        raycaster.current.ray.intersectPlane(plane.current, planeIntersect.current);
+        offset.current = selectedObject.current.position.clone().sub(planeIntersect.current);;
+      }
+    };
+
+    const handleMouseUp = () => {
+      selectedObject.current = null; // Avsluta drag när musen släpps
+    };
+
+    gl.domElement.addEventListener('mousemove', handleMouseMove);
+    gl.domElement.addEventListener('mousedown', handleMouseDown);
+    gl.domElement.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      gl.domElement.removeEventListener('mousemove', handleMouseMove);
+      gl.domElement.removeEventListener('mousedown', handleMouseDown);
+      gl.domElement.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [modelRefs, camera, gl]);
+
+  return null;
 }
