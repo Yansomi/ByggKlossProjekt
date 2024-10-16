@@ -3,7 +3,7 @@ import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { useFrame, useThree } from '@react-three/fiber';
 let glbPath1;
-export function Model({ id, position, gridSize, cellSize, allModels, updateModelPosition, removeModel, trashCorner, rotation, setLastMovedModelId, modelRefs, canvasRef , glbPath, geometry, material,widthModefier,preBuiltSpawn,sceneRef }) {
+export function Model({ id, position, gridSize, cellSize,rotation, allModels, modelRefs, glbPath, geometry, material,widthModefier,preBuiltSpawn}) {
   glbPath1 = glbPath;
   const { nodes, materials } = useGLTF(glbPath1);
   const { gl, raycaster, camera, scene } = useThree();
@@ -11,7 +11,6 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
   const planeIntersect = new THREE.Vector3();
   const lastPosition = useRef(new THREE.Vector3());
   const allModelsRef = useRef(allModels);
-  const trashCornerRef = useRef(trashCorner);
   const dragControlsRef = useRef();
   const groupRef = useRef();
   const selectedModelIds = [];
@@ -25,17 +24,12 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
   useEffect(() => {
     // Lägg till referens till modelRefs när modellen skapas
     modelRefs.current = groupRef.current;
-    sceneRef.current = scene;
     // Ta bort referensen från modelRefs när komponenten unmountas
-    console.log("modelRef", modelRefs.current);
     return () => {
       delete modelRefs.current;
     };
   }, [id, modelRefs]);
   
-  useEffect(() => {
-    trashCornerRef.current = trashCorner;
-  }, [trashCorner]);
 
 
   useEffect(() => {
@@ -44,7 +38,6 @@ export function Model({ id, position, gridSize, cellSize, allModels, updateModel
       groupRef.current.position.set(...position);
       groupRef.current.children[0].rotation.y = rotation;
       groupRef.current.userData.id = id;
-      console.log(groupRef.current);
     }
   }, [rotation, position]);
 

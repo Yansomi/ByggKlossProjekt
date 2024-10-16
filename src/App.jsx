@@ -7,7 +7,7 @@ import { MOUSE } from 'three';
 import * as THREE from 'three';
 import controller from '../src/controlls';
 
-function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material,higthModefier,widthModefier,lengthModefier, preBuiltSpawn, sceneRef}) {
+function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material,higthModefier,widthModefier,lengthModefier, preBuiltSpawn}) {
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersect = new THREE.Vector3();
   useFrame(({ camera }) => {
@@ -21,7 +21,6 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
       }
     }
   });
-  console.log("position spawn", tempModel.position );
   return tempModel ? (
     <Model
       key={tempModel.id}
@@ -42,7 +41,6 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
       material={material}
       widthModefier={tempModel.widthModefier}
       preBuiltSpawn={tempModel.preBuiltSpawn}
-      sceneRef={sceneRef}
     />
   ) : null;
 }
@@ -65,8 +63,6 @@ function App() {
   const [isRightMouseDown, setIsRightMouseDown] = useState(false);
   const [selectedObjectId, setSelectedObjectId] = useState(null);
   const cameraRef = useRef();
-  const sceneRef = useRef();
-
   const calculateTrashCornerPosition = (gridSize) => ({
     x: gridSize / 2 + trashCornerSize / 2,
     z: gridSize / 2 + trashCornerSize / 2,
@@ -86,24 +82,23 @@ function App() {
     const newId = models.length ? models[models.length - 1].id + 1 : 1;
     const initialPosition = [0, 0, 0]; // Set an appropriate initial position
     let newModel ;
-    console.log(block);
     if(block == 1){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.5, widthModefier:0.60 , lengthModefier:1.4, preBuiltSpawn:false, price:10};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.5, widthModefier:0.7 , lengthModefier:1.5, preBuiltSpawn:false, price:10};
     }
     if(block == 2){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x400-transformed.glb', geometry:'1600x800x400', material:'1600x800x400', higthModefier:0.75, widthModefier:0.30 , lengthModefier:0.7, preBuiltSpawn:false, price:10};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x400-transformed.glb', geometry:'1600x800x400', material:'1600x800x400', higthModefier:0.75, widthModefier:0.7 , lengthModefier:1.5, preBuiltSpawn:false, price:10};
     }
     if(block == 3){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x400x400-transformed.glb', geometry:'1600x400x400', material:'1600x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.7, preBuiltSpawn:false, price:10};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x400x400-transformed.glb', geometry:'1600x400x400', material:'1600x400x400', higthModefier:0.75, widthModefier:0.35 , lengthModefier:1.5, preBuiltSpawn:false, price:10};
     }
     if(block == 4){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:false, price:10};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.7 , lengthModefier:0.7, preBuiltSpawn:false, price:10};
     }
     if(block == 5){
-      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x400-transformed.glb', geometry:'800x800x400', material:'800x800x400', higthModefier:0.75, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:false, price:10};
+      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x400-transformed.glb', geometry:'800x800x400', material:'800x800x400', higthModefier:0.75, widthModefier:0.7 , lengthModefier:0.8, preBuiltSpawn:false, price:10};
     }
     if(block == 6){
-      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x400x400-transformed.glb', geometry:'800x400x400', material:'800x400x400', higthModefier:0.75, widthModefier:0.2 , lengthModefier:0.4, preBuiltSpawn:false, price:10};
+      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x400x400-transformed.glb', geometry:'800x400x400', material:'800x400x400', higthModefier:0.75, widthModefier:0.35 , lengthModefier:0.7, preBuiltSpawn:false, price:10};
     }
     setTempModel(newModel);
   };
@@ -158,7 +153,6 @@ function App() {
   };
 
   const blockAndpriceUpdate = () => {
-    console.log(models);
     if(models){
       setBlocksnumber(models.length);
       let newPrice = 0;
@@ -185,6 +179,10 @@ function App() {
         });
       });
     }
+  };
+  
+  const getModels = () => {
+    return models;
   };
 
   const addPreBuilt = (number) => {
@@ -257,9 +255,9 @@ function App() {
             position={[x, 20, z]}
             angle={Math.PI / 2}
             penumbra={0.5}
-            intensity={0.8}
+            intensity={10}
             distance={40}
-            power={100}
+            power={2000}
           />
         );
       }
@@ -361,7 +359,7 @@ function App() {
           cameraRef.current = camera;
         }}
       >
-        <Grid position={[0, 0, 0]} rel="grid" args={[gridSize, gridSize]} cellSize={cellSize} lineWidth={1} />
+        <Grid position={[0, 0, 0]} className="grid" rel="grid" args={[gridSize, gridSize]} cellSize={cellSize} lineWidth={2} />
         <GridLabels gridSize={gridSize} />
         <OrbitControls
           panSpeed={7}
@@ -406,7 +404,6 @@ function App() {
           material={model.material}
           widthModefier={model.widthModefier}
           preBuiltSpawn={model.preBuiltSpawn}
-          sceneRef={sceneRef}
         />
 ))}
 {isPlacingModel && (
@@ -436,7 +433,6 @@ function App() {
             widthModefier={tempModel.widthModefier}
             lengthModefier={tempModel.lengthModefier}
             preBuiltSpawn={tempModel.preBuiltSpawn}
-            sceneRef={sceneRef}
           />
         )}
         {/* Visualisera sophörnan */}
@@ -444,7 +440,8 @@ function App() {
           <boxGeometry args={[trashCorner.size, 5, trashCorner.size]} />
           <meshBasicMaterial color="red" />
         </mesh>
-        <Controls modelRefs={modelRefs} gridSize={gridSize} canvasRef={canvasRef} cameraRef={cameraRef} updateModelPosition={updateModelPosition}/>
+        <Controls modelRefs={modelRefs} gridSize={gridSize} canvasRef={canvasRef} cameraRef={cameraRef} updateModelPosition={updateModelPosition}
+        models={models} cellSize={cellSize} setLastMovedModelId={setLastMovedModelId}/>
       </Canvas>
     </>
   
@@ -472,7 +469,7 @@ function GridLabels({ gridSize }) {
   return <>{labels}</>;
 }
 
-function Controls({ modelRefs, gridSize, canvasRef, cameraRef, updateModelPosition}) {
+function Controls({ modelRefs, gridSize, canvasRef, cameraRef, updateModelPosition, models, cellSize, setLastMovedModelId}) {
   const raycaster = useRef(new THREE.Raycaster());
   const mouse = useRef(new THREE.Vector2());
   const selectedObject = useRef(null); // Håll koll på valt objekt
@@ -480,23 +477,23 @@ function Controls({ modelRefs, gridSize, canvasRef, cameraRef, updateModelPositi
   const plane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)); // Ett plan för att "dra" objekt på rätt nivå
   const planeIntersect = useRef(new THREE.Vector3());
   const offset = useRef(new THREE.Vector3()); // För att hålla den initiala offseten
-
+  const selectedObjectId = useRef(null);
+  const modelsRef = useRef(models);
+  useEffect(() => {
+    modelsRef.current = models;
+  }, [models]);
   useEffect(() => {
     const handleMouseMove = (event) => {
       const rect = canvasRef.current.getBoundingClientRect();
       mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      console.log(camera.current);
       raycaster.current.setFromCamera(mouse.current, camera);
-
       if (selectedObject.current) {
         raycaster.current.ray.intersectPlane(plane.current, planeIntersect.current);
                 // Justera positionen med den initiala offseten
         const newPosition = planeIntersect.current.clone().add(offset.current);
-        //const newPosition = planeIntersect.current;
-        console.log("position after spawn", newPosition);
-        console.log("objekt", selectedObject.current);
-        const controllerPos = controller(newPosition,gridSize);
+        selectedObject.current.position.copy(newPosition);
+        const controllerPos = controller(selectedObject.current,gridSize, modelsRef.current, selectedObjectId.current,cellSize);
         selectedObject.current.position.copy(controllerPos);
         updateModelPosition(selectedObject.current.userData.id, controllerPos.toArray(),false);
       }
@@ -512,7 +509,7 @@ function Controls({ modelRefs, gridSize, canvasRef, cameraRef, updateModelPositi
 
       if (intersects.length > 0) {
         selectedObject.current = intersects[0].object.parent; // Markera objektet som ska dras
-
+        selectedObjectId.current = selectedObject.current.userData.id;
         // Beräkna offset mellan musen och objektets position
         raycaster.current.ray.intersectPlane(plane.current, planeIntersect.current);
         offset.current = selectedObject.current.position.clone().sub(planeIntersect.current);;
@@ -520,6 +517,8 @@ function Controls({ modelRefs, gridSize, canvasRef, cameraRef, updateModelPositi
     };
 
     const handleMouseUp = () => {
+      if(!selectedObject.current) return;
+      setLastMovedModelId(selectedObject.current.userData.id);
       selectedObject.current = null; // Avsluta drag när musen släpps
     };
 
