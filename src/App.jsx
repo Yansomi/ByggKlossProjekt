@@ -7,7 +7,7 @@ import { MOUSE } from 'three';
 import * as THREE from 'three';
 import controller from '../src/controlls';
 
-function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material,higthModefier,widthModefier,lengthModefier, preBuiltSpawn}) {
+function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material,higthModefier,widthModefier,lengthModefier, preBuiltSpawn, sceneRef}) {
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const planeIntersect = new THREE.Vector3();
   useFrame(({ camera }) => {
@@ -41,6 +41,7 @@ function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,m
       material={material}
       widthModefier={tempModel.widthModefier}
       preBuiltSpawn={tempModel.preBuiltSpawn}
+      sceneRef={sceneRef}
     />
   ) : null;
 }
@@ -61,8 +62,10 @@ function App() {
   const mouse = useRef(new THREE.Vector2());
   const [isCtrlPressed, setIsCtrlPressed] = useState(false);
   const [isRightMouseDown, setIsRightMouseDown] = useState(false);
-  const [selectedObjectId, setSelectedObjectId] = useState(null);
   const cameraRef = useRef();
+  const [tempGridSize, setTempGridSize] = useState(gridSize);
+  const sceneRef = useRef();
+
   const calculateTrashCornerPosition = (gridSize) => ({
     x: gridSize / 2 + trashCornerSize / 2,
     z: gridSize / 2 + trashCornerSize / 2,
@@ -118,15 +121,13 @@ function App() {
   }, [isPlacingModel, tempModel, numberOfBlocks]);
 
   const handleGridSizeChange = (event) => {
-    if(Number(event.target.value) < 10){
-      setGridSize(20);
-    }
-    else if(Number(event.target.value) > 200){
-      setGridSize(200);
-    }
-    else{
-    setGridSize(Number(event.target.value));
-    }
+    const newGridSize = Math.max(10, Math.min(100, Number(tempGridSize)));
+    setGridSize(newGridSize);
+  };
+
+  
+  const handleTempGridSizeChange = (event) => {
+    setTempGridSize(event.target.value); // Uppdatera endast det temporära värdet
   };
 
   const handleCellSizeChange = (event) => {
@@ -338,7 +339,7 @@ function App() {
         <div>
           <label className='gridSize'>
             Grid Size:
-            <input  type="number" value={gridSize} onChange={handleGridSizeChange} />
+            <input  type="number" value={tempGridSize} onChange={handleTempGridSizeChange} onBlur={handleGridSizeChange} />
           </label>
         </div>
         <div className='modelCounter'>
@@ -359,7 +360,7 @@ function App() {
           cameraRef.current = camera;
         }}
       >
-        <Grid position={[0, 0, 0]} className="grid" rel="grid" args={[gridSize, gridSize]} cellSize={cellSize} lineWidth={2} />
+        <Grid position={[0, 0, 0]} rel="grid" args={[gridSize, gridSize]} cellSize={cellSize} lineWidth={2} />
         <GridLabels gridSize={gridSize} />
         <OrbitControls
           panSpeed={7}
@@ -404,6 +405,7 @@ function App() {
           material={model.material}
           widthModefier={model.widthModefier}
           preBuiltSpawn={model.preBuiltSpawn}
+          sceneRef={sceneRef}
         />
 ))}
 {isPlacingModel && (
@@ -433,6 +435,7 @@ function App() {
             widthModefier={tempModel.widthModefier}
             lengthModefier={tempModel.lengthModefier}
             preBuiltSpawn={tempModel.preBuiltSpawn}
+            sceneRef={sceneRef}
           />
         )}
         {/* Visualisera sophörnan */}
@@ -440,8 +443,8 @@ function App() {
           <boxGeometry args={[trashCorner.size, 5, trashCorner.size]} />
           <meshBasicMaterial color="red" />
         </mesh>
-        <Controls modelRefs={modelRefs} gridSize={gridSize} canvasRef={canvasRef} cameraRef={cameraRef} updateModelPosition={updateModelPosition}
-        models={models} cellSize={cellSize} setLastMovedModelId={setLastMovedModelId}/>
+        <Controls sceneRef={sceneRef} gridSize={gridSize} canvasRef={canvasRef} updateModelPosition={updateModelPosition}
+        models={models} cellSize={cellSize} setLastMovedModelId={setLastMovedModelId} trashCorner={trashCorner} removeModel={removeModel}/>
       </Canvas>
     </>
   
@@ -454,22 +457,23 @@ export default App;
 function GridLabels({ gridSize }) {
   const labels = [];
   const step = gridSize / 10; // Justera steget efter behov
-
+  let stepLable = 0;
   for (let i = -gridSize / 2; i <= gridSize / 2; i += step) {
     labels.push(
       <Text key={`x-${i + i}`} position={[i, 0, -gridSize / 2 - 2]} fontSize={2} color="black">
-        {i}
+        {stepLable}
       </Text>,
       <Text key={`z-${i + i}`} position={[-gridSize / 2 - 2, 0, i]} fontSize={2} color="black" rotation={[0, Math.PI / 2, 0]}>
-        {i}
+        {stepLable}
       </Text>
     );
+    stepLable += step;
   }
 
   return <>{labels}</>;
 }
 
-function Controls({ modelRefs, gridSize, canvasRef, cameraRef, updateModelPosition, models, cellSize, setLastMovedModelId}) {
+function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, cellSize, setLastMovedModelId, trashCorner, removeModel}) {
   const raycaster = useRef(new THREE.Raycaster());
   const mouse = useRef(new THREE.Vector2());
   const selectedObject = useRef(null); // Håll koll på valt objekt
@@ -479,9 +483,21 @@ function Controls({ modelRefs, gridSize, canvasRef, cameraRef, updateModelPositi
   const offset = useRef(new THREE.Vector3()); // För att hålla den initiala offseten
   const selectedObjectId = useRef(null);
   const modelsRef = useRef(models);
+  const trashCornerRef = useRef(trashCorner);
+  const modelRefs = useRef(sceneRef.current);
+
+  useEffect(() => {
+    modelRefs.current = sceneRef.current;
+  },[sceneRef]);
+
   useEffect(() => {
     modelsRef.current = models;
   }, [models]);
+
+  useEffect(() => {
+    trashCornerRef.current = trashCorner;
+  }, [trashCorner]);
+
   useEffect(() => {
     const handleMouseMove = (event) => {
       const rect = canvasRef.current.getBoundingClientRect();
@@ -493,7 +509,7 @@ function Controls({ modelRefs, gridSize, canvasRef, cameraRef, updateModelPositi
                 // Justera positionen med den initiala offseten
         const newPosition = planeIntersect.current.clone().add(offset.current);
         selectedObject.current.position.copy(newPosition);
-        const controllerPos = controller(selectedObject.current,gridSize, modelsRef.current, selectedObjectId.current,cellSize);
+        const controllerPos = controller(selectedObject.current,gridSize, modelsRef.current, selectedObjectId.current,cellSize,trashCornerRef,removeModel);
         selectedObject.current.position.copy(controllerPos);
         updateModelPosition(selectedObject.current.userData.id, controllerPos.toArray(),false);
       }
@@ -501,9 +517,12 @@ function Controls({ modelRefs, gridSize, canvasRef, cameraRef, updateModelPositi
 
     const handleMouseDown = (event) => {
       if (event.button !== 0) return; // Bara vänsterklick
-
+      console.log(modelRefs.current);
       raycaster.current.setFromCamera(mouse.current, camera);
-      const objectsToCheck = modelRefs.current.parent.children;
+      const objectsWithId = modelRefs.current.children.filter(
+        (obj) => obj.userData && obj.userData.id !== undefined
+      );
+      const objectsToCheck = objectsWithId;
 
       const intersects = raycaster.current.intersectObjects(objectsToCheck, true);
 

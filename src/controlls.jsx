@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import React from 'react';
 import { mod } from 'three/examples/jsm/nodes/Nodes.js';
 
-function controller(object, gridSize, models, id, cellSize)
+function controller(object, gridSize, models, id, cellSize,trashCornerRef,removeModel)
 {
     const newPosition = new THREE.Vector3().copy(object.position);
     const gridBoundary = calculateGridBoundary(gridSize);
@@ -10,7 +10,6 @@ function controller(object, gridSize, models, id, cellSize)
     for(let i=0;i < models.length;i++){
       if(models[i].id === id){
         currentHight = models[i].position[1];
-        console.log(currentHight);
       }
     }
     newPosition.x = THREE.MathUtils.clamp(newPosition.x, gridBoundary.minX, gridBoundary.maxX + 10);
@@ -21,6 +20,21 @@ function controller(object, gridSize, models, id, cellSize)
     const { snapped, snappedToModelsPosition } = snapToOtherModels(id,object, models, currentHight);
     if(!snapped){
       snappedToModelsPosition.y = 0;
+    }
+    const worldPosition = new THREE.Vector3();
+    object.position.copy(snappedToModelsPosition);
+    worldPosition.copy(object.position);
+    const currentTrashCorner = trashCornerRef.current;
+
+    const isInTrashCorner =
+    worldPosition.x >= currentTrashCorner.x - currentTrashCorner.size / 2 &&
+    worldPosition.x <= currentTrashCorner.x + currentTrashCorner.size / 2 &&
+    worldPosition.z >= currentTrashCorner.z - currentTrashCorner.size / 2 &&
+    worldPosition.z <= currentTrashCorner.z + currentTrashCorner.size / 2;
+
+    if (isInTrashCorner) {
+      removeModel(id);
+      return;
     }
     return snappedToModelsPosition;
 }
