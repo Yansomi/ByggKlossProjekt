@@ -255,7 +255,7 @@ function App() {
             penumbra={0.5}
             intensity={0.8}
             distance={40}
-            power={100}
+            power={2000}
           />
         );
       }
