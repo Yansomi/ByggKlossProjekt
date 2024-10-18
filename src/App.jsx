@@ -473,23 +473,26 @@ function GridLabels({ gridSize }) {
   return <>{labels}</>;
 }
 
-function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, cellSize, setLastMovedModelId, trashCorner, removeModel}) {
+function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, cellSize, setLastMovedModelId, trashCorner, removeModel }) {
   const raycaster = useRef(new THREE.Raycaster());
   const mouse = useRef(new THREE.Vector2());
-  const selectedObject = useRef(null); // Håll koll på valt objekt
+  const selectedObjects = useRef([]); // Håller koll på valda objekt
   const { gl, camera } = useThree();
   const plane = useRef(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)); // Ett plan för att "dra" objekt på rätt nivå
   const planeIntersect = useRef(new THREE.Vector3());
-  const offset = useRef(new THREE.Vector3()); // För att hålla den initiala offseten
-  const selectedObjectId = useRef(null);
+  const offsets = useRef([]); // Håller den initiala offseten för varje valt objekt
   const modelsRef = useRef(models);
   const trashCornerRef = useRef(trashCorner);
   const modelRefs = useRef(sceneRef);
-  const originalMaterial = useRef(null);
+  const silhouetteMaterial = new THREE.MeshBasicMaterial({
+    color: 0x00ff00, // Valfri färg för silhuetten
+    opacity: 0.5,
+    transparent: true,
+  });
 
   useEffect(() => {
     modelRefs.current = sceneRef.current;
-  },[sceneRef.current]);
+  }, [sceneRef]);
 
   useEffect(() => {
     modelsRef.current = models;
@@ -499,67 +502,97 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
     trashCornerRef.current = trashCorner;
   }, [trashCorner]);
 
-  const silhouetteMaterial = new THREE.MeshBasicMaterial({
-    color: 0x00ff00, // Valfri färg för silhuetten
-    opacity: 0.5,
-    transparent: true,
-  });
+  const handleMouseMove = (event) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.current.setFromCamera(mouse.current, camera);
+
+    if (selectedObjects.current.length > 0) {
+      raycaster.current.ray.intersectPlane(plane.current, planeIntersect.current);
+
+      selectedObjects.current.forEach((selectedObject, index) => {
+        const newPosition = planeIntersect.current.clone().add(offsets.current[index]);
+
+        // Tilldela ny position
+        selectedObject.position.copy(newPosition);
+
+        const controllerPos = controller(selectedObject, gridSize, modelsRef.current, selectedObject.userData.id, cellSize, trashCornerRef, removeModel);
+        if (controllerPos) {
+          selectedObject.position.copy(controllerPos);
+          updateModelPosition(selectedObject.userData.id, controllerPos.toArray(), false);
+        }
+      });
+    }
+  };
+
+  const handleMouseDown = (event) => {
+    if (event.button !== 0) return; // Bara vänsterklick
+    raycaster.current.setFromCamera(mouse.current, camera);
+    const objectsWithId = modelRefs.current.children.filter(
+      (obj) => obj.userData && obj.userData.id !== undefined
+    );
+    const intersects = raycaster.current.intersectObjects(objectsWithId, true);
+
+    if (intersects.length > 0) {
+      const clickedObject = intersects[0].object.parent;
+      const alreadySelected = selectedObjects.current.includes(clickedObject);
+
+      if (event.ctrlKey) {
+        // Ctrl hålls ned för att välja flera objekt
+        if (alreadySelected) {
+          // Om objektet redan är valt, avmarkera det
+          const index = selectedObjects.current.indexOf(clickedObject);
+          selectedObjects.current.splice(index, 1);
+          offsets.current.splice(index, 1);
+          
+          // Återställ materialet
+          clickedObject.children[0].material = clickedObject.originalMaterial || clickedObject.children[0].material;
+        } else {
+          // Lägg till objektet i listan över valda objekt
+          selectedObjects.current.push(clickedObject);
+          offsets.current.push(clickedObject.position.clone().sub(planeIntersect.current));
+          
+          // Spara ursprungliga materialet och sätt highlight-materialet
+          clickedObject.originalMaterial = clickedObject.children[0].material;
+          clickedObject.children[0].material = silhouetteMaterial; // Sätt highlight-material
+        }
+      } else {
+        // Ingen Ctrl nedtryckt: välj bara ett objekt, avmarkera allt annat
+        selectedObjects.current.forEach((obj) => {
+          obj.children[0].material = obj.originalMaterial || obj.children[0].material;
+        });
+        selectedObjects.current = [clickedObject];
+        offsets.current = [];
+        
+        // Spara ursprungliga materialet
+        clickedObject.originalMaterial = clickedObject.children[0].material;
+        clickedObject.children[0].material = silhouetteMaterial;
+        
+        raycaster.current.ray.intersectPlane(plane.current, planeIntersect.current);
+        offsets.current.push(clickedObject.position.clone().sub(planeIntersect.current));
+      }
+    } else if (!event.ctrlKey) {
+      // Om inget objekt träffas och Ctrl inte hålls ner, avmarkera allt
+      selectedObjects.current.forEach((obj) => {
+        obj.children[0].material = obj.originalMaterial || obj.children[0].material;
+      });
+      selectedObjects.current = [];
+      offsets.current = [];
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (selectedObjects.current.length === 1) {
+      // Om bara ett objekt är valt, återställ materialet när draget är klart
+      selectedObjects.current[0].children[0].material = selectedObjects.current[0].originalMaterial || selectedObjects.current[0].children[0].material;
+      setLastMovedModelId(selectedObjects.current[0].userData.id);
+      selectedObjects.current = [];
+      offsets.current = [];
+    }
+  };
 
   useEffect(() => {
-    const handleMouseMove = (event) => {
-      const rect = canvasRef.current.getBoundingClientRect();
-      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.current.setFromCamera(mouse.current, camera);
-      if (selectedObject.current) {
-        raycaster.current.ray.intersectPlane(plane.current, planeIntersect.current);
-        
-        // Justera positionen med den initiala offseten
-        const newPosition = planeIntersect.current.clone().add(offset.current);
-
-        selectedObject.current.position.copy(newPosition);
-        const controllerPos = controller(selectedObject.current,gridSize, modelsRef.current, selectedObjectId.current,cellSize,trashCornerRef,removeModel);
-        if(!controllerPos) return;
-        selectedObject.current.position.copy(controllerPos);
-        updateModelPosition(selectedObject.current.userData.id, controllerPos.toArray(),false);
-      }
-    };
-
-    const handleMouseDown = (event) => {
-      if (event.button !== 0) return; // Bara vänsterklick
-      raycaster.current.setFromCamera(mouse.current, camera);
-      const objectsWithId = modelRefs.current.children.filter(
-        (obj) => obj.userData && obj.userData.id !== undefined
-      );
-      const objectsToCheck = objectsWithId;
-
-      const intersects = raycaster.current.intersectObjects(objectsToCheck, true);
-
-      if (intersects.length > 0) {
-        selectedObject.current = intersects[0].object.parent; // Markera objektet som ska dras
-        selectedObjectId.current = selectedObject.current.userData.id;
-
-        // Spara ursprungliga materialet och sätt highlight-materialet
-        originalMaterial.current = selectedObject.current.children[0].material;
-        selectedObject.current.children[0].material = silhouetteMaterial;
-
-        // Beräkna offset mellan musen och objektets position
-        raycaster.current.ray.intersectPlane(plane.current, planeIntersect.current);
-        offset.current = selectedObject.current.position.clone().sub(planeIntersect.current);;
-      }
-    };
-
-    const handleMouseUp = () => {
-      if(!selectedObject.current) return;
-      setLastMovedModelId(selectedObject.current.userData.id);
-
-      // Återställ till ursprungliga materialet
-      selectedObject.current.children[0].material = originalMaterial.current;
-      setLastMovedModelId(selectedObject.current.userData.id);
-
-      selectedObject.current = null; // Avsluta drag när musen släpps
-    };
-
     gl.domElement.addEventListener('mousemove', handleMouseMove);
     gl.domElement.addEventListener('mousedown', handleMouseDown);
     gl.domElement.addEventListener('mouseup', handleMouseUp);
