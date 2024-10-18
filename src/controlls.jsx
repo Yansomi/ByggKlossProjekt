@@ -169,7 +169,6 @@ function calculateGridBoundary(gridSize) {
         let modelWidth = model.widthModefier;
         let modelLength = model.lengthModefier;
         let isOnTop = false;
-        console.log("else körs");
         if(model.preBuiltSpawn === true){
           modelPos.x = modelPos.x/2;
           modelPos.z = modelPos.z/2;

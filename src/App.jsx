@@ -485,6 +485,7 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
   const modelsRef = useRef(models);
   const trashCornerRef = useRef(trashCorner);
   const modelRefs = useRef(sceneRef);
+  const originalMaterial = useRef(null);
 
   useEffect(() => {
     modelRefs.current = sceneRef.current;
@@ -498,6 +499,12 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
     trashCornerRef.current = trashCorner;
   }, [trashCorner]);
 
+  const silhouetteMaterial = new THREE.MeshBasicMaterial({
+    color: 0x00ff00, // Valfri färg för silhuetten
+    opacity: 0.5,
+    transparent: true,
+  });
+
   useEffect(() => {
     const handleMouseMove = (event) => {
       const rect = canvasRef.current.getBoundingClientRect();
@@ -506,8 +513,10 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
       raycaster.current.setFromCamera(mouse.current, camera);
       if (selectedObject.current) {
         raycaster.current.ray.intersectPlane(plane.current, planeIntersect.current);
-                // Justera positionen med den initiala offseten
+        
+        // Justera positionen med den initiala offseten
         const newPosition = planeIntersect.current.clone().add(offset.current);
+
         selectedObject.current.position.copy(newPosition);
         const controllerPos = controller(selectedObject.current,gridSize, modelsRef.current, selectedObjectId.current,cellSize,trashCornerRef,removeModel);
         if(!controllerPos) return;
@@ -529,6 +538,11 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
       if (intersects.length > 0) {
         selectedObject.current = intersects[0].object.parent; // Markera objektet som ska dras
         selectedObjectId.current = selectedObject.current.userData.id;
+
+        // Spara ursprungliga materialet och sätt highlight-materialet
+        originalMaterial.current = selectedObject.current.children[0].material;
+        selectedObject.current.children[0].material = silhouetteMaterial;
+
         // Beräkna offset mellan musen och objektets position
         raycaster.current.ray.intersectPlane(plane.current, planeIntersect.current);
         offset.current = selectedObject.current.position.clone().sub(planeIntersect.current);;
@@ -538,6 +552,11 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
     const handleMouseUp = () => {
       if(!selectedObject.current) return;
       setLastMovedModelId(selectedObject.current.userData.id);
+
+      // Återställ till ursprungliga materialet
+      selectedObject.current.children[0].material = originalMaterial.current;
+      setLastMovedModelId(selectedObject.current.userData.id);
+
       selectedObject.current = null; // Avsluta drag när musen släpps
     };
 
