@@ -325,7 +325,7 @@ function App() {
           <button type="button" className="btn btn-success">Blocks</button>
           <div className="btn-group" role="group">
             <button id="btnGroupDrop2" type="button" className="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-              <div className="dropdown-content">
+              <div className="dropdown-content button">
               <button type="button" className="btn btn-outline-dark" onClick={() => addModel(1)}>1600x800x800</button>
               <button type="button" className="btn btn-outline-dark" onClick={() => addModel(2)}>1600x800x400</button>
               <button type="button" className="btn btn-outline-dark" onClick={() => addModel(3)}>1600x400x400</button>
@@ -484,11 +484,11 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
   const selectedObjectId = useRef(null);
   const modelsRef = useRef(models);
   const trashCornerRef = useRef(trashCorner);
-  const modelRefs = useRef(sceneRef.current);
+  const modelRefs = useRef(sceneRef);
 
   useEffect(() => {
     modelRefs.current = sceneRef.current;
-  },[sceneRef]);
+  },[sceneRef.current]);
 
   useEffect(() => {
     modelsRef.current = models;
@@ -510,6 +510,7 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
         const newPosition = planeIntersect.current.clone().add(offset.current);
         selectedObject.current.position.copy(newPosition);
         const controllerPos = controller(selectedObject.current,gridSize, modelsRef.current, selectedObjectId.current,cellSize,trashCornerRef,removeModel);
+        if(!controllerPos) return;
         selectedObject.current.position.copy(controllerPos);
         updateModelPosition(selectedObject.current.userData.id, controllerPos.toArray(),false);
       }
@@ -517,7 +518,6 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
 
     const handleMouseDown = (event) => {
       if (event.button !== 0) return; // Bara vänsterklick
-      console.log(modelRefs.current);
       raycaster.current.setFromCamera(mouse.current, camera);
       const objectsWithId = modelRefs.current.children.filter(
         (obj) => obj.userData && obj.userData.id !== undefined

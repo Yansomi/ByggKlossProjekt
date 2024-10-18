@@ -15,7 +15,9 @@ function controller(object, gridSize, models, id, cellSize,trashCornerRef,remove
     newPosition.x = THREE.MathUtils.clamp(newPosition.x, gridBoundary.minX, gridBoundary.maxX + 10);
     newPosition.z = THREE.MathUtils.clamp(newPosition.z, gridBoundary.minZ, gridBoundary.maxZ + 10);
     newPosition.y = THREE.MathUtils.clamp(newPosition.y, gridBoundary.minY, 20);
+    object.position.copy(newPosition);
     const snappedToGrid = snapToGrid(object,cellSize,models,id)
+    if(!snappedToGrid) return;
     object.position.copy(snappedToGrid);
     const { snapped, snappedToModelsPosition } = snapToOtherModels(id,object, models, currentHight);
     if(!snapped){
@@ -34,7 +36,6 @@ function controller(object, gridSize, models, id, cellSize,trashCornerRef,remove
 
     if (isInTrashCorner) {
       removeModel(id);
-      return;
     }
     return snappedToModelsPosition;
 }
@@ -58,6 +59,7 @@ function calculateGridBoundary(gridSize) {
       {
         cellDivider = 8;
       }
+    if(!object.children[0]) return;
     if(object.children[0].rotation.y > 3.13 && object.children[0].rotation.y < 3.15
       || object.children[0].rotation.y === 0)
       {

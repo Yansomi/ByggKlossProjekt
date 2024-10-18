@@ -8,20 +8,19 @@ export function Model({ id, position, gridSize,rotation, allModels, modelRefs, g
   const { nodes, materials } = useGLTF(glbPath1);
   const allModelsRef = useRef(allModels);
   const groupRef = useRef();
-  const scene = new THREE.Scene();
+  const scene = useThree();
   useEffect(() => {
     allModelsRef.current = allModels;
   }, [allModels]);
   useEffect(() => {
     // Lägg till referens till modelRefs när modellen skapas
     modelRefs.current = groupRef.current;
-    sceneRef.current = scene;
-    console.log("scene", scene);
+    sceneRef.current = scene.scene;
     // Ta bort referensen från modelRefs när komponenten unmountas
     return () => {
       delete modelRefs.current;
     };
-  }, [id, modelRefs]);
+  }, [id, modelRefs,sceneRef]);
   
 
 
