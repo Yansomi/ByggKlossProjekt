@@ -2,11 +2,12 @@ import * as THREE from 'three';
 import React from 'react';
 import { mod } from 'three/examples/jsm/nodes/Nodes.js';
 
-function controller(object, gridSize, models, id, cellSize,trashCornerRef,removeModel)
+function controller(object, gridSize, models, id, cellSize,trashCornerRef,removeModel,selectedIds)
 {
     const newPosition = new THREE.Vector3().copy(object.position);
     const gridBoundary = calculateGridBoundary(gridSize);
     let currentHight = 0;
+    let removed = false;
     for(let i=0;i < models.length;i++){
       if(models[i].id === id){
         currentHight = models[i].position[1];
@@ -19,7 +20,8 @@ function controller(object, gridSize, models, id, cellSize,trashCornerRef,remove
     const snappedToGrid = snapToGrid(object,cellSize,models,id)
     if(!snappedToGrid) return;
     object.position.copy(snappedToGrid);
-    const { snapped, snappedToModelsPosition } = snapToOtherModels(id,object, models, currentHight);
+
+    const { snapped, snappedToModelsPosition } = snapToOtherModels(id,object, models, currentHight, selectedIds);
     if(!snapped){
       snappedToModelsPosition.y = 0;
     }
@@ -36,8 +38,9 @@ function controller(object, gridSize, models, id, cellSize,trashCornerRef,remove
 
     if (isInTrashCorner) {
       removeModel(id);
+      removed = true;
     }
-    return snappedToModelsPosition;
+    return {controllerPos:snappedToModelsPosition, removed:removed};
 }
 
 function calculateGridBoundary(gridSize) {
@@ -81,7 +84,7 @@ function calculateGridBoundary(gridSize) {
     return snappedPosition;
   }
 
-  function snapToOtherModels(id,object, models, currentHight) {
+  function snapToOtherModels(id,object, models, currentHight,selectedIds) {
     if (!object) {
       return {snapped: false, snappedToModelsPosition: null}
     }
@@ -110,7 +113,7 @@ function calculateGridBoundary(gridSize) {
       };
     // Snap to height first
     models.forEach((model) => {
-      if(model.id === id) return;
+      if(selectedIds.includes(model.id)) return;
       const Id = model.id.toString();
   
       let shouldBeonTop = false;
@@ -128,16 +131,12 @@ function calculateGridBoundary(gridSize) {
           isModelRotated = false;
         };
   
-      if (model.id != id && shouldBeonTop) {
+      if (!selectedIds.includes(model.id) && shouldBeonTop) {
         const modelPos = new THREE.Vector3(...model.position);
         const modelHeight = model.higthModefier;
         let modelWidth = model.widthModefier;
         let modelLength = model.lengthModefier;
-        if(model.preBuiltSpawn === true){
-          modelPos.x = modelPos.x/2;
-          modelPos.z = modelPos.z/2;
-          modelPos.y = modelPos.y/2;
-        }
+
       
         if(xOnLenght ===true && isModelRotated === true){
           if (Math.abs(position.x - modelPos.x) < onXthreshold + modelLength && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelWidth) {
@@ -164,15 +163,12 @@ function calculateGridBoundary(gridSize) {
           }
         }
       }
-      else if(model.id != id && !snapped){
+      else if(!selectedIds.includes(model.id) && !snapped){
         const modelPos = new THREE.Vector3(...model.position);
         let modelWidth = model.widthModefier;
         let modelLength = model.lengthModefier;
         let isOnTop = false;
-        if(model.preBuiltSpawn === true){
-          modelPos.x = modelPos.x/2;
-          modelPos.z = modelPos.z/2;
-        }
+
         if(xOnLenght ===true && isModelRotated === true){
           if (Math.abs(position.x - modelPos.x) < onXthreshold + modelLength && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelWidth) {
             position.y = currentHight;
@@ -199,6 +195,70 @@ function calculateGridBoundary(gridSize) {
             snapped =  true;
             isOnTop = true;
             position.y = currentHight;
+          }
+        }
+      }
+    });
+    models.forEach((model) => {
+      if(selectedIds.includes(model.id) && model.id != id){
+        const modelPos = new THREE.Vector3(...model.position);
+        let isModelRotated;
+        if(model.rotation > 3.13 && model.rotation < 3.15
+          || model.rotation === 0)
+          {
+            isModelRotated = true;
+          }
+      
+          else{
+            isModelRotated = false;
+          };
+        if(position.y >= modelPos.y){
+          const modelHeight = model.higthModefier;
+          let modelWidth = model.widthModefier;
+          let modelLength = model.lengthModefier;
+          if(xOnLenght ===true && isModelRotated === true){
+            if (Math.abs(position.x - modelPos.x) < onXthreshold + modelLength && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelWidth) {
+              if(modelPos.y ===  position.y){
+                position.y = (modelPos.y + modelHeight);
+                snapped = true;
+              }
+              else{
+                snapped = true;
+              }
+            }
+          }
+          else if(xOnLenght === false && isModelRotated === false){
+            if (Math.abs(position.x - modelPos.x) < notOnXthreshold + modelWidth && Math.abs(position.z - modelPos.z) < onXthreshold + modelLength) {
+              if(modelPos.y ===  position.y){
+                position.y = (modelPos.y + modelHeight);
+                snapped = true;
+              }
+              else{
+                snapped = true;
+              }
+            }
+          }
+          else if(xOnLenght === true && isModelRotated === false){
+            if (Math.abs(position.x - modelPos.x) < onXthreshold + modelWidth && Math.abs(position.z - modelPos.z) < notOnXthreshold + modelLength) {
+              if(modelPos.y ===  position.y){
+                position.y = (modelPos.y + modelHeight);
+                snapped = true;
+              }
+              else{
+                snapped = true;
+              }
+            }
+          }
+          else if(xOnLenght === false && isModelRotated === true){
+            if (Math.abs(position.x - modelPos.x) < notOnXthreshold + modelLength  && Math.abs(position.z - modelPos.z) < onXthreshold + modelWidth) {
+              if(modelPos.y ===  position.y){
+                position.y = (modelPos.y + modelHeight);
+                snapped = true;
+              }
+              else{
+                snapped = true;
+              }
+            }
           }
         }
       }

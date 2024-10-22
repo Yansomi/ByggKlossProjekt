@@ -86,7 +86,7 @@ function App() {
     const initialPosition = [0, 0, 0]; // Set an appropriate initial position
     let newModel ;
     if(block == 1){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.5, widthModefier:0.7 , lengthModefier:1.5, preBuiltSpawn:false, price:10};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800', higthModefier:1.5, widthModefier:0.60 , lengthModefier:1.25, preBuiltSpawn:false, price:10};
     }
     if(block == 2){
      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x400-transformed.glb', geometry:'1600x800x400', material:'1600x800x400', higthModefier:0.75, widthModefier:0.7 , lengthModefier:1.5, preBuiltSpawn:false, price:10};
@@ -95,7 +95,7 @@ function App() {
      newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x400x400-transformed.glb', geometry:'1600x400x400', material:'1600x400x400', higthModefier:0.75, widthModefier:0.35 , lengthModefier:1.5, preBuiltSpawn:false, price:10};
     }
     if(block == 4){
-     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.7 , lengthModefier:0.7, preBuiltSpawn:false, price:10};
+     newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.6, lengthModefier:0.6, preBuiltSpawn:false, price:10};
     }
     if(block == 5){
       newModel = { id: newId, position: initialPosition, rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x400-transformed.glb', geometry:'800x800x400', material:'800x800x400', higthModefier:0.75, widthModefier:0.7 , lengthModefier:0.8, preBuiltSpawn:false, price:10};
@@ -202,7 +202,7 @@ function App() {
     for(let i = 0;i < 3 ;i++){
 
       newId += 1;
-      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true, price:10};
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.6 , lengthModefier:1.25, preBuiltSpawn:true, price:10};
       preBuilt.push(block);
       initialPosition[0] += 3.2;
     }
@@ -212,7 +212,7 @@ function App() {
       initialPosition[2] = 0.8;
       for(let i = 0;i < 3;i++){
         newId += 1;
-        block = {id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true, price:10};
+        block = {id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.6 , lengthModefier:1.25, preBuiltSpawn:true, price:10};
         preBuilt.push(block);
         initialPosition[2] += 3.2;
       }
@@ -221,7 +221,7 @@ function App() {
     initialPosition = [-4.8,1.5,0];
     for(let i= 0;i < 4;i++){
       newId +=1;
-      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true, price:10};
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.6 , lengthModefier:1.25, preBuiltSpawn:true, price:10};
       preBuilt.push(block);
       initialPosition[0] += 3.2;
     }
@@ -230,7 +230,7 @@ function App() {
       initialPosition[2] = 2.4;
       for(let i = 0;i < 2;i++){
         newId += 1;
-        block = {id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.3 , lengthModefier:0.6, preBuiltSpawn:true, price:10};
+        block = {id: newId, position: [...initialPosition], rotation: rotation, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_1600x800x800-transformed.glb', geometry:'1600x800x800', material:'1600x800x800',higthModefier:1.5, widthModefier:0.6 , lengthModefier:1.25, preBuiltSpawn:true, price:10};
         preBuilt.push(block);
         initialPosition[2] += 3.2;
       }
@@ -239,7 +239,7 @@ function App() {
     initialPosition = [-5.6,1.5,8];
     for(let i = 0;i < 2;i++){
       newId +=1;
-      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.30 , lengthModefier:0.4, preBuiltSpawn:true, price:10};
+      block = { id: newId, position: [...initialPosition], rotation: 0, hight:2, width: 2, lenght: 2, glbPath:'/src/assets/agab_block_800x800x800-transformed.glb', geometry:'800x800x800', material:'800x800x800', higthModefier:1.5, widthModefier:0.6 , lengthModefier:0.6, preBuiltSpawn:true, price:10};
       preBuilt.push(block);
       initialPosition[0] = 5.6;
     }
@@ -327,11 +327,11 @@ function App() {
             <button id="btnGroupDrop2" type="button" className="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
               <div className="dropdown-content button">
               <button type="button" className="btn btn-outline-dark" onClick={() => addModel(1)}>1600x800x800</button>
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(2)}>1600x800x400</button>
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(3)}>1600x400x400</button>
+{/*               <button type="button" className="btn btn-outline-dark" onClick={() => addModel(2)}>1600x800x400</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(3)}>1600x400x400</button> */}
               <button type="button" className="btn btn-outline-dark" onClick={() => addModel(4)}>800x800x800</button>
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(5)}>800x800x400</button>
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(6)}>800x400x400</button>
+              {/* <button type="button" className="btn btn-outline-dark" onClick={() => addModel(5)}>800x800x400</button>
+              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(6)}>800x400x400</button> */}
             </div>
           </div>
         </div>
@@ -485,15 +485,17 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
   const trashCornerRef = useRef(trashCorner);
   const modelRefs = useRef(sceneRef);
   const isDragging = useRef(false); 
+  let selectedIds = [];
   const silhouetteMaterial = new THREE.MeshBasicMaterial({
     color: 0x00ff00, // Valfri färg för silhuetten
     opacity: 0.5,
     transparent: true,
   });
 
+
   useEffect(() => {
     modelRefs.current = sceneRef.current;
-  }, [sceneRef]);
+  }, [sceneRef.current]);
 
   useEffect(() => {
     modelsRef.current = models;
@@ -517,11 +519,15 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
   
         // Tilldela ny position
         selectedObject.position.copy(newPosition);
+
   
-        const controllerPos = controller(selectedObject, gridSize, modelsRef.current, selectedObject.userData.id, cellSize, trashCornerRef, removeModel);
-        if (controllerPos) {
+        const {controllerPos, removed} = controller(selectedObject, gridSize, modelsRef.current, selectedObject.userData.id, cellSize, trashCornerRef, removeModel, selectedIds);
+        if (!removed && controllerPos) {
           selectedObject.position.copy(controllerPos);
           updateModelPosition(selectedObject.userData.id, controllerPos.toArray(), false);
+        }
+        else if(removed){
+          selectedObjects.current = [];
         }
       });
     }
@@ -535,7 +541,6 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
       (obj) => obj.userData && obj.userData.id !== undefined
     );
     const intersects = raycaster.current.intersectObjects(objectsWithId, true);
-  
     if (intersects.length > 0) {
       const clickedObject = intersects[0].object.parent;
       const alreadySelected = selectedObjects.current.includes(clickedObject);
@@ -547,7 +552,9 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
           const index = selectedObjects.current.indexOf(clickedObject);
           selectedObjects.current.splice(index, 1);
           offsets.current.splice(index, 1);
-  
+          // ta bort id av redan valt objekt
+          const idsIndex = selectedIds.indexOf(clickedObject.userData.id);
+          selectedIds.splice(idsIndex, 1);
           // Återställ materialet
           clickedObject.children[0].material = clickedObject.originalMaterial || clickedObject.children[0].material;
         } else {
@@ -558,6 +565,9 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
           // Spara ursprungliga materialet och sätt highlight-materialet
           clickedObject.originalMaterial = clickedObject.children[0].material;
           clickedObject.children[0].material = silhouetteMaterial;
+
+          //lägg till id i selectedIds
+          selectedIds.push(clickedObject.userData.id);
         }
       } else {
         // Ingen Ctrl nedtryckt
@@ -568,11 +578,14 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
           isDragging.current = true; // Starta drag
         } else {
           // Om objektet inte är markerat, avmarkera alla och markera endast det klickade objektet
+          console.log(selectedObjects.current);
           selectedObjects.current.forEach((obj) => {
             obj.children[0].material = obj.originalMaterial || obj.children[0].material;
           });
           selectedObjects.current = [clickedObject];
           offsets.current = [];
+          selectedIds = [];
+          selectedIds.push(clickedObject.userData.id);
   
           // Spara ursprungliga materialet och markera det nya objektet
           clickedObject.originalMaterial = clickedObject.children[0].material;
@@ -592,6 +605,7 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
       selectedObjects.current = [];
       offsets.current = [];
       isDragging.current = false; // Sluta dra
+      selectedIds = [];
     }
   };
   
@@ -605,6 +619,7 @@ function Controls({ sceneRef, gridSize, canvasRef, updateModelPosition, models, 
         setLastMovedModelId(selectedObjects.current[0].userData.id);
         selectedObjects.current = [];
         offsets.current = [];
+        selectedIds = [];
       }
     }
   };
