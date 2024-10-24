@@ -6,6 +6,7 @@ import { OrbitControls, Grid, Text } from '@react-three/drei';
 import { MOUSE } from 'three';
 import * as THREE from 'three';
 import controller from '../src/controlls';
+import MeasureTool from '../src/Measuretool';
 
 function TempModel({ tempModel, mouse, raycaster, setTempModel, isPlacingModel,modelRefs , trashCorner, gridSize, cellSize,allModels, updateModelPosition, removeModel, setLastMovedModelId, canvasRef, glbPath, geometry, material,higthModefier,widthModefier,lengthModefier, preBuiltSpawn, sceneRef}) {
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
@@ -122,7 +123,7 @@ function App() {
 
   const handleGridSizeChange = (event) => {
     const newGridSize = Math.max(10, Math.min(100, Number(tempGridSize)));
-    setGridSize(newGridSize);
+    setGridSize(newGridSize *2);
   };
 
   
@@ -318,40 +319,75 @@ function App() {
   return (
     <div className='canvasBody'>
     <>
-  <div className='buttonBody'>
-            <button className='buttonRotate' onClick={rotateModel}>Rotate Last Moved Model</button> 
-      <div className="dropdown">
-         <div className="btn-group" role="group" aria-label="Button group with nested dropdown">
-          <button type="button" className="btn btn-success">Blocks</button>
-          <div className="btn-group" role="group">
-            <button id="btnGroupDrop2" type="button" className="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-              <div className="dropdown-content button">
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(1)}>1600x800x800</button>
-{/*               <button type="button" className="btn btn-outline-dark" onClick={() => addModel(2)}>1600x800x400</button>
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(3)}>1600x400x400</button> */}
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(4)}>800x800x800</button>
-              {/* <button type="button" className="btn btn-outline-dark" onClick={() => addModel(5)}>800x800x400</button>
-              <button type="button" className="btn btn-outline-dark" onClick={() => addModel(6)}>800x400x400</button> */}
-            </div>
-          </div>
-        </div>
-      </div> 
-        <div>
-          <label className='gridSize'>
-            Grid Size:
-            <input  type="number" value={tempGridSize} onChange={handleTempGridSizeChange} onBlur={handleGridSizeChange} />
-          </label>
-        </div>
-        <div className='modelCounter'>
-          <label>Blocks:{numberOfBlocks}</label>
-        </div>
-        <div className='price'>
-          <label >Pris:{pris}</label>
-        </div>
-        <div className='prebuiltGroup'>
-        <button type='button' className='preBuilt' onClick={()=> addPreBuilt(1)}>test</button>
+<div className='buttonBody'>
+  <div className="workspace-container">
+    <div className="input-group">
+      <label htmlFor="grid-size" className="input-label">Ange arbetsytan:</label>
+      <div className="input-field">
+        <input
+          type="number"
+          id="grid-size"
+          value={tempGridSize}
+          onChange={handleTempGridSizeChange}
+          onBlur={handleGridSizeChange}
+          className="area-input"
+        />
+        <span className="unit-label">m²</span>
       </div>
+      <span className="subtext">Avser rutnäts-storleken du vill arbeta med.</span>
+    </div>
+
+    <div className="dropdown-container">
+      <button type="button" className="add-block-button">
+        + LÄGG TILL BLOCK
+      </button>
+      <div className="dropdown-content">
+        <button type="button" className="dropdown-item" onClick={() => addModel(1)}>1600x800x800</button>
+        <button type="button" className="dropdown-item" onClick={() => addModel(4)}>800x800x800</button>
+      </div>
+    </div>
   </div>
+
+  <div className='prebuiltGroup'>
+    <button type='button' className='preBuilt' onClick={()=> addPreBuilt(1)}>test</button>
+  </div>
+
+  <div className="offer-container">
+  <div className="info-box">
+    <div className="info-block">
+      <div className="info-text">
+        <span className="info-label">Antal block</span>
+      </div>
+      <div className="icon-block">
+        <img src="src/assets/package.svg" alt="block icon" className="icon" />
+      </div>
+      <div className="info-value">
+        <span>{numberOfBlocks} st</span>
+      </div>
+    </div>
+
+    <div className="info-block">
+      <div className="info-text">
+        <span className="info-label">Totalpris ex moms:</span>
+      </div>
+      <div className="icon-block">
+        <img src="src/assets/priceTag.svg" alt="price icon" className="icon" />
+      </div>
+      <div className="info-value">
+        <span>{pris} kr</span>
+      </div>
+    </div>
+  </div>
+
+  <div className="button-box">
+    <button className="secondary-action-button">VISA PRODUKTLISTA</button>
+    <button className="action-button">BEGÄR OFFERT</button>
+  </div>
+</div>
+
+
+</div>
+
   <Canvas
         className='canvas'
         ref={canvasRef}
@@ -443,6 +479,7 @@ function App() {
           <boxGeometry args={[trashCorner.size, 5, trashCorner.size]} />
           <meshBasicMaterial color="red" />
         </mesh>
+        <MeasureTool />
         <Controls sceneRef={sceneRef} gridSize={gridSize} canvasRef={canvasRef} updateModelPosition={updateModelPosition}
         models={models} cellSize={cellSize} setLastMovedModelId={setLastMovedModelId} trashCorner={trashCorner} removeModel={removeModel}/>
       </Canvas>
@@ -461,10 +498,10 @@ function GridLabels({ gridSize }) {
   for (let i = -gridSize / 2; i <= gridSize / 2; i += step) {
     labels.push(
       <Text key={`x-${i + i}`} position={[i, 0, -gridSize / 2 - 2]} fontSize={2} color="black">
-        {stepLable}
+        {stepLable/2}
       </Text>,
       <Text key={`z-${i + i}`} position={[-gridSize / 2 - 2, 0, i]} fontSize={2} color="black" rotation={[0, Math.PI / 2, 0]}>
-        {stepLable}
+        {stepLable/2}
       </Text>
     );
     stepLable += step;
