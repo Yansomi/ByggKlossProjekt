@@ -321,6 +321,14 @@ function App() {
     <>
 <div className='buttonBody'>
   <div className="workspace-container">
+    <div className='help-button-container'>
+      <button type='button' className='help-button'>
+        Hjälp
+      </button>
+      <div className='help-dropdown-container'>
+        <span>För att snurra kameran håll inne vänster musknapp</span>
+    </div>
+    </div>
     <div className="input-group">
       <label htmlFor="grid-size" className="input-label">Ange arbetsytan:</label>
       <div className="input-field">
@@ -338,12 +346,20 @@ function App() {
     </div>
 
     <div className="dropdown-container">
+      <div className='dropdown-icon-constainer'>
+        <div className='dropdown-icon-box'>
+          <img src="src\assets\plus.svg" alt="block icon" className="dropdown-icon" />
+        </div>
+        <div className='dropdown-icon-box-2'>
+          <img src="src/assets/package.svg" alt="block icon" className="dropdown-icon" />
+        </div>
+      </div>
       <button type="button" className="add-block-button">
         + LÄGG TILL BLOCK
       </button>
       <div className="dropdown-content">
-        <button type="button" className="dropdown-item" onClick={() => addModel(1)}>1600x800x800</button>
-        <button type="button" className="dropdown-item" onClick={() => addModel(4)}>800x800x800</button>
+        <button type="button" className="dropdown-item" onClick={() => addModel(1)}> +1600x800x800</button>
+        <button type="button" className="dropdown-item" onClick={() => addModel(4)}> +800x800x800</button>
       </div>
     </div>
   </div>
@@ -353,35 +369,39 @@ function App() {
   </div>
 
   <div className="offer-container">
-  <div className="info-box">
-    <div className="info-block">
+    <div className='info-box-container'>
+      <div className="info-text-2">
+            <span className="info-label">Totalpris ex moms:</span>
+      </div>
       <div className="info-text">
-        <span className="info-label">Antal block</span>
+          <span className="info-label">Antal block</span>
       </div>
-      <div className="icon-block">
-        <img src="src/assets/package.svg" alt="block icon" className="icon" />
+    <div className="info-box">
+      <div className="info-block">
+        <div className="icon-block">
+          <img src="src/assets/package.svg" alt="block icon" className="icon" />
+        </div>
+        <div className="info-value">
+          <span>{numberOfBlocks} st</span>
+        </div>
       </div>
-      <div className="info-value">
-        <span>{numberOfBlocks} st</span>
-      </div>
-    </div>
 
-    <div className="info-block">
-      <div className="info-text">
-        <span className="info-label">Totalpris ex moms:</span>
-      </div>
-      <div className="icon-block">
-        <img src="src/assets/priceTag.svg" alt="price icon" className="icon" />
-      </div>
-      <div className="info-value">
-        <span>{pris} kr</span>
+      <div className="info-block">
+        <div className="icon-block">
+          <img src="src/assets/priceTag.svg" alt="price icon" className="icon" />
+        </div>
+        <div className="info-value">
+          <span>{pris} kr</span>
+        </div>
       </div>
     </div>
   </div>
 
-  <div className="button-box">
-    <button className="secondary-action-button">VISA PRODUKTLISTA</button>
-    <button className="action-button">BEGÄR OFFERT</button>
+  <div className='button-container'>
+    <div className="button-box">
+      <button className="secondary-action-button">VISA PRODUKTLISTA</button>
+      <button className="action-button">BEGÄR OFFERT</button>
+    </div>
   </div>
 </div>
 
