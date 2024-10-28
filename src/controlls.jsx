@@ -200,6 +200,7 @@ function calculateGridBoundary(gridSize) {
         }
       }
     });
+    //ska egentligen kolla mellan andra modeller som är valda, men kollar med modelen som är i fråga istället, behövs ändras
     models.forEach((model) => {
       if(selectedIds.includes(model.id) && model.id != id){
         const modelPos = new THREE.Vector3(...model.position);
