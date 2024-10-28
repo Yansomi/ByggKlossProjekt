@@ -323,11 +323,16 @@ function App() {
   <div className="workspace-container">
     <div className='help-button-container'>
       <button type='button' className='help-button'>
+        <img src="src\assets\Questionmark.svg" alt="Hjälp ikon" className="help-icon" />
         Hjälp
       </button>
       <div className='help-dropdown-container'>
-        <span>För att snurra kameran håll inne vänster musknapp</span>
-    </div>
+        <span className='help-text'>För att rotera kameran håll inne vänster musknapp.
+          Håll inne ctrl för att markera flera block.
+          Håll inne shift för att använda mätverktyg med musen.
+          
+        </span>
+      </div>
     </div>
     <div className="input-group">
       <label htmlFor="grid-size" className="input-label">Ange arbetsytan:</label>
@@ -358,8 +363,12 @@ function App() {
         + LÄGG TILL BLOCK
       </button>
       <div className="dropdown-content">
-        <button type="button" className="dropdown-item" onClick={() => addModel(1)}> +1600x800x800</button>
-        <button type="button" className="dropdown-item" onClick={() => addModel(4)}> +800x800x800</button>
+        <button type="button" className="dropdown-item" onClick={() => addModel(1)}>
+          <img src="src\assets\Block_1600_800_800.jpg" alt="block icon" className="block-icon" />
+           1600x800x800</button>
+        <button type="button" className="dropdown-item" onClick={() => addModel(4)}>
+          <img src="src\assets\Block_800_800_800.jpg" alt="block icon" className="block-icon" />
+           800x800x800</button>
       </div>
     </div>
   </div>
@@ -374,7 +383,7 @@ function App() {
             <span className="info-label">Totalpris ex moms:</span>
       </div>
       <div className="info-text">
-          <span className="info-label">Antal block</span>
+          <span className="info-label">Antal block:</span>
       </div>
     <div className="info-box">
       <div className="info-block">
@@ -386,7 +395,7 @@ function App() {
         </div>
       </div>
 
-      <div className="info-block">
+      <div className="info-block-price">
         <div className="icon-block">
           <img src="src/assets/priceTag.svg" alt="price icon" className="icon" />
         </div>
@@ -416,7 +425,7 @@ function App() {
           cameraRef.current = camera;
         }}
       >
-        <Grid position={[0, 0, 0]} rel="grid" args={[gridSize, gridSize]} cellSize={cellSize} lineWidth={2} />
+        <Grid position={[0, 0, 0]} rel="grid" sectionColor="grey" args={[gridSize, gridSize]} cellSize={cellSize} lineWidth={2} />
         <GridLabels gridSize={gridSize} />
         <OrbitControls
           panSpeed={7}

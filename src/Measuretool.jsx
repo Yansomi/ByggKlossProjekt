@@ -102,7 +102,7 @@ function MeasureTool() {
             anchorY="middle"
             onUpdate={(self) => self.lookAt(camera.position)} // Se till att texten alltid riktas mot kameran
           >
-            {distance.toFixed(2)} units
+            {distance.toFixed(2)} M
           </Text>
         </group>
       ))}

@@ -94,8 +94,9 @@ body{
 }
 .prebuiltGroup {
   position: relative;
-  top: -250px;
-  left: 650px;
+  top: -160px;
+  left: -50px;
+  pointer-events: auto;
 }
 .preBuilt {
   padding: 16px;
@@ -126,11 +127,14 @@ body{
   justify-content: space-between;
   align-items: center;
   background-color: transparent;
-  padding: 10px;
+  padding: 0px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   pointer-events: auto;
   height: 150px;
+  z-index: 3;
+  border: none; /* Tar bort eventuell kantlinje */
+  box-shadow: none; /* Tar bort skuggan */
 }
 
 .input-group {
@@ -138,11 +142,17 @@ body{
   flex-direction: column;
   gap: 5px;
   position: relative;
+  border: none;
   left: -40px;
+  top: 10px;
+  width: 200px;
+  height: 40px;
 }
 .input-label {
   color: black;
   width: 220px;
+  position: relative;
+  top: -10px;
 }
 
 .input-field {
@@ -155,8 +165,8 @@ body{
   width: 150px;
   height: 35px;
   position: relative;
-  left: 250px;
-  top: -24px;
+  left: 5px;
+  top: -5px;
   border: none; /* Ingen kant på input */
   outline: none; /* Ingen kant på fokus */
 }
@@ -195,23 +205,24 @@ body{
   font-size: 12px;
   color: #666;
   position: relative;
-  top: -45px;
+  top: 10px;
   width: 240px;
+  left: -380px;
 }
 
 .dropdown-container {
   display: flex;
   align-items: center;
   position: relative;
-  top: 24px;
+  top: 54px;
   left: -120px;
 }
 .dropdown-icon-constainer {
-width: 50px;
-height: 40px;
-background-color: #006400;
-border-bottom-left-radius: 10px;
-border-top-left-radius: 10px;
+  width: 50px;
+  height: 40px;
+  background-color: #006400;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
 }
 .dropdown-icon-box {
   width: 25px;
@@ -254,6 +265,7 @@ border-top-left-radius: 0px;
   border-radius: 8px;
   margin-top: 10px;
   height: 80px;
+  z-index: 5;
 }
 
 .add-block-button:hover + .dropdown-content,
@@ -280,29 +292,50 @@ border-top-left-radius: 0px;
   border-radius: 8px;
 
 }
+.block-icon {
+  background-color: #ccc;
+  height: 40px;
+  width: 40px;
+}
 .help-button-container {
   background-color: transparent;
   position: relative;
-  width: 80px;
+  width: 100px;
   height: 40px;
-  top: 20px;
-  left: 160px;
+  top: 55px;
+  left: 140px;
 }
 .help-button {
   background-color: white;
   color: black;
+  z-index: 4;
+  cursor: pointer;
+  width: 100px;
+  height: 40px;
+  border: none;
+  padding: none;
 }
 .help-dropdown-content {
   background-color: white;
   color: black;
 }
-.help-button:hover + .help-dropdown-container,
-.help-dropdown-container:hover {
+.help-button:hover + .help-dropdown-container
+ {
   display: block;
 }
 .help-button,
 .help-dropdown-container {
   display: inline-block; /* För att se till att både knappen och dropdown-container beter sig korrekt */
+}
+.help-text {
+  font-size: 0.8em;
+}
+.help-icon {
+  background-color: #006400;
+  border-radius: 10px;
+  position: relative;
+  left: -8px;
+  top: -3px;
 }
 .help-dropdown-container {
   background-color: white;
@@ -311,12 +344,13 @@ border-top-left-radius: 0px;
   text-align: center;
   position: relative;
   left: -110px;
+  top: 5px;
   border-radius: 10px;
   display: none;
 }
 .offer-container {
   background-color: transparent;
-  padding: 20px;
+  padding: 0px;
   border-radius: 10px;
   text-align: center;
   width: 280px; /* Öka bredden något */
@@ -324,23 +358,25 @@ border-top-left-radius: 0px;
   z-index: 3;
   pointer-events: auto;
   position: relative;
-  left: 80px;
+  top: 150px;
+  left: 40px;
 }
 .info-box-container {
   background-color: #e42313;
-  padding: 20px;
+  padding: 0px;
   border-radius: 10px;
   text-align: center;
-  width: 280px; /* Öka bredden något */
+  width: 200px; /* Öka bredden något */
   margin: 0 auto; /* Center för hela sidan */
-  height: 90px;
+  height: 50px;
+  position: relative;
+  z-index: 3;
 }
 
 .info-box {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
   position: relative;
   top: -24px;
 }
@@ -348,25 +384,41 @@ border-top-left-radius: 0px;
 .info-block {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 10px;
+  justify-content:center;
+  padding: 0px;
   font-size: 0.8rem; /* Gör texten mindre */
+  position: relative;
+  top: 50%;
+  width: 80px;
+  height: 30px;
+}
+.info-block-price {
+  display: flex;
+  align-items: center;
+  justify-content:center;
+  padding: 0px;
+  font-size: 0.8rem; /* Gör texten mindre */
+  position: relative;
+  top: 0px;
+  left: -0px;
+  width: 110px;
+  height: 30px;
 }
 
 .info-text {
   color: white;
   text-align: left;
-  width: 120px;
+  width: 80px;
   top: -24px;
   position: relative;
-  left: 0px;
+  left: 10px;
 }
 .info-text-2 {
   color: white;
   text-align: left;
   width: 120px;
   position: relative;
-  left:120px;
+  left:90px;
   top: 0px;
 }
 
@@ -377,11 +429,14 @@ border-top-left-radius: 0px;
 .info-value {
   font-weight: bold;
   font-size: 1.2rem; /* Minska blockens värden */
-  margin-top: 5px;
+  height: 30px;
+  width: 80px;
 }
 
 .icon-block {
   margin-right: 10px;
+  align-items:start;
+  display: flex;
 }
 
 .icon {
@@ -400,12 +455,13 @@ border-top-left-radius: 0px;
   background-color: rgb(223, 219, 219);
   border: none;
   color: #e42313;
-  padding: 10px 20px;
-  margin: 5px 0;
+  padding: 0px;
   font-size: 0.8rem; /* Minska textstorleken */
   font-weight: bold;
   border-radius: 5px;
-  width: 100%;
+  width: 60%;
+  position: relative;
+  top: 13px;
 }
 
 .secondary-action-button {
@@ -413,11 +469,12 @@ border-top-left-radius: 0px;
   color: #e42313;
   font-weight: normal;
   border-radius: 5px;
-  padding: 10px 20px;
-  margin: 5px 0;
+  padding: 0px;
   font-size: 0.8rem; /* Minska textstorleken */
-  width: 100%;
+  width: 80%;
   border: none;
+  position: relative;
+  top: 10px;
 }
 .secondary-action-button:hover {
   background-color: #e42313;
@@ -429,10 +486,16 @@ border-top-left-radius: 0px;
   color: white;
 }
 .button-container {
-  margin: 0 auto;
+  margin: 0px;
   background-color: white;
-  padding: 20px;
-  width: 280px;
+  padding: 0px;
+  width: 200px;
+  height: 60px;
+  border-radius: 10px;
+  position: relative;
+  left: 40px;
+  top: -15px;
+  z-index: 2;
 }
 
 

@@ -40,6 +40,7 @@ function controller(object, gridSize, models, id, cellSize,trashCornerRef,remove
       removeModel(id);
       removed = true;
     }
+    //const collisionPosition = collision(object, id, models);
     return {controllerPos:snappedToModelsPosition, removed:removed};
 }
 
@@ -264,5 +265,37 @@ function calculateGridBoundary(gridSize) {
       }
     });
     return {snapped: snapped, snappedToModelsPosition: position};
+  }
+
+  function collision (object, id, models)
+  {
+    let ObjectRotated;
+    let modelRotated;
+
+    if(object.children[0].rotation.y > 3.13 && object.children[0].rotation.y < 3.15
+      || object.children[0].rotation.y === 0)
+      {
+        ObjectRotated = true;
+      }
+    else{
+      ObjectRotated = false;
+      };
+
+    models.forEach((model) =>{
+      if(model.id != id){
+
+        if(model.rotation > 3.13 && model.rotation < 3.15
+          || model.rotation === 0)
+          {
+            modelRotated = true;
+          }
+      
+          else{
+            modelRotated = false;
+          };
+
+
+      }
+    })
   }
   export default controller;
