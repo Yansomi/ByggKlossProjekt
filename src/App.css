@@ -8,7 +8,7 @@
   justify-content: center;
   align-items: center;
   display: flex;
-  background: rgb(249, 250, 248);
+  background: rgb(240, 241, 239);
   height: 76vh;
 
   border-radius: .4rem;
@@ -20,7 +20,7 @@
 body{
   margin: 0;
   padding: 0;
-  background: rgb(255, 255, 255);
+  background: rgb(228, 224, 224);
   overflow: hidden;
   width: 100%;
 }
@@ -53,8 +53,8 @@ body{
   top: 40px;
 }
 .grid{
-  color: #1409f0;
-  
+  color: #10e56c;
+  border-color: #3e8e41;
 }
 .buttonAdd{
   color: white;
@@ -63,33 +63,8 @@ body{
   left: 80px;
   top: 10px;
 }
-.buttonRotate{
-  color: white;
-  position: relative;
-  background-color: green;
-  width: 180px;
-  height: 60px;
-  left: 890px;
-  top: -75px;
-  text-align-last: center;
-}
-.gridSize{
-  position: relative;
-  left: 100px;
-  top: -120px;
   
-}
-/* .sidePanel{
-  background-color: rgb(223, 39, 7);
-  width: 380px;
-  height: 400px;
-  border-radius: 25px;
-  outline: auto;
-  outline-style: inset;
-  outline-width: 20px;
-  outline-color: rgb(55, 218, 14);
-  outline-color: rgb(238, 228, 30);
-} */
+
 .modelCounter{
   position: relative;
   left: 600px;
@@ -101,38 +76,6 @@ body{
   left: 500px;
   top: -170px;
 }
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color:transparent;
-  min-width: 80px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 2;
-}
-.dropbtn {
-  position: relative;
-  background-color: #04AA6D;
-  color: white;
-  padding: 16px;
-  font-size: 16px;
-  top: 50px;
-  left: 10px;
-  border: none;
-}
-.dropdown {
-  position: inherit;
-  display: inline-block;
-  top: -90px;
-  left: 900px;
-}
-/* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #ddd;}
-
-/* Show the dropdown menu on hover */
-.dropdown:hover .dropdown-content {display: block;}
-
-/* Change the background color of the dropdown button when the dropdown content is shown */
-.dropdown:hover .dropbtn {background-color: #3e8e41;}
 .canvas {
   position: absolute;
   top: 0;
@@ -140,14 +83,7 @@ body{
   width: 100%;
   height: 100%;
   display: block;
-}
-.buttonBody {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: auto;
+  z-index: 1;
 }
 .canvasBody {
   position: relative; /* För att .buttonBody ska kunna positioneras absolut inom denna */
@@ -155,5 +91,412 @@ body{
   height: 100%;
   padding: 0;
   margin: 0;
-  
 }
+.prebuiltGroup {
+  position: relative;
+  top: -160px;
+  left: -50px;
+  pointer-events: auto;
+}
+.preBuilt {
+  padding: 16px;
+  font-size: 16px;
+  color: #3e8e41;
+}
+.buttonBody {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color:transparent;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 20px auto;
+  position: absolute;
+  top: -50px;
+  left: 875px;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.workspace-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: transparent;
+  padding: 0px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
+  height: 150px;
+  z-index: 3;
+  border: none; /* Tar bort eventuell kantlinje */
+  box-shadow: none; /* Tar bort skuggan */
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: relative;
+  border: none;
+  left: -40px;
+  top: 10px;
+  width: 200px;
+  height: 40px;
+}
+.input-label {
+  color: black;
+  width: 220px;
+  position: relative;
+  top: -10px;
+}
+
+.input-field {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 150px;
+  height: 35px;
+  position: relative;
+  left: 5px;
+  top: -5px;
+  border: none; /* Ingen kant på input */
+  outline: none; /* Ingen kant på fokus */
+}
+
+.area-input {
+  width: 80px;
+  border: none;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  border: none; /* Ingen kant på input */
+  outline: none; /* Ingen kant på fokus */
+  padding: 8px;
+  background: white;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+}
+
+.unit-label {
+  font-size: 16px;
+  margin-left: 0px;
+  width: 40px;
+  background: white;
+  color: black;
+  padding: 8px;
+  border-left: 5px rgb(197, 188, 188);
+  position: relative;
+  left: 3px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.subtext {
+  font-size: 12px;
+  color: #666;
+  position: relative;
+  top: 10px;
+  width: 240px;
+  left: -380px;
+}
+
+.dropdown-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  top: 54px;
+  left: -120px;
+}
+.dropdown-icon-constainer {
+  width: 50px;
+  height: 40px;
+  background-color: #006400;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+}
+.dropdown-icon-box {
+  width: 25px;
+  height: 40px;
+}
+.dropdown-icon-box-2 {
+  width: 25px;
+  height: 40px;
+  position: relative;
+  left: 25px;
+  top: -40px;
+}
+.dropdown-icon {
+  position: relative;
+  top: 6px;
+}
+
+.add-block-button {
+  background-color: white;
+  color: black;
+  font-size: 10px;
+  cursor: pointer;
+  height: 40px;
+  width: 120px;
+  border: none;
+  padding:0px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 0px;
+border-top-left-radius: 0px;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 30px;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  margin-top: 10px;
+  height: 80px;
+  z-index: 5;
+}
+
+.add-block-button:hover + .dropdown-content,
+.dropdown-content:hover {
+  display: block;
+}
+
+.dropdown-item {
+  background-color: rgb(243, 239, 239);
+  color: #090909 !important;
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  width: 150px;
+  height: 40px;
+  display: flex;
+  border-radius: 8px;
+}
+
+.dropdown-item:hover {
+  background-color: #eb0b0b !important;
+  color: white !important;
+  border-radius: 8px;
+
+}
+.block-icon {
+  background-color: #ccc;
+  height: 40px;
+  width: 40px;
+}
+.help-button-container {
+  background-color: transparent;
+  position: relative;
+  width: 100px;
+  height: 40px;
+  top: 55px;
+  left: 140px;
+}
+.help-button {
+  background-color: white;
+  color: black;
+  z-index: 4;
+  cursor: pointer;
+  width: 100px;
+  height: 40px;
+  border: none;
+  padding: none;
+}
+.help-dropdown-content {
+  background-color: white;
+  color: black;
+}
+.help-button:hover + .help-dropdown-container
+ {
+  display: block;
+}
+.help-button,
+.help-dropdown-container {
+  display: inline-block; /* För att se till att både knappen och dropdown-container beter sig korrekt */
+}
+.help-text {
+  font-size: 0.8em;
+}
+.help-icon {
+  background-color: #006400;
+  border-radius: 10px;
+  position: relative;
+  left: -8px;
+  top: -3px;
+}
+.help-dropdown-container {
+  background-color: white;
+  color: black;
+  width: 300px;
+  text-align: center;
+  position: relative;
+  left: -110px;
+  top: 5px;
+  border-radius: 10px;
+  display: none;
+}
+.offer-container {
+  background-color: transparent;
+  padding: 0px;
+  border-radius: 10px;
+  text-align: center;
+  width: 280px; /* Öka bredden något */
+  margin: 0 auto; /* Center för hela sidan */
+  z-index: 3;
+  pointer-events: auto;
+  position: relative;
+  top: 150px;
+  left: 40px;
+}
+.info-box-container {
+  background-color: #e42313;
+  padding: 0px;
+  border-radius: 10px;
+  text-align: center;
+  width: 200px; /* Öka bredden något */
+  margin: 0 auto; /* Center för hela sidan */
+  height: 50px;
+  position: relative;
+  z-index: 3;
+}
+
+.info-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  top: -24px;
+}
+
+.info-block {
+  display: flex;
+  align-items: center;
+  justify-content:center;
+  padding: 0px;
+  font-size: 0.8rem; /* Gör texten mindre */
+  position: relative;
+  top: 50%;
+  width: 80px;
+  height: 30px;
+}
+.info-block-price {
+  display: flex;
+  align-items: center;
+  justify-content:center;
+  padding: 0px;
+  font-size: 0.8rem; /* Gör texten mindre */
+  position: relative;
+  top: 0px;
+  left: -0px;
+  width: 110px;
+  height: 30px;
+}
+
+.info-text {
+  color: white;
+  text-align: left;
+  width: 80px;
+  top: -24px;
+  position: relative;
+  left: 10px;
+}
+.info-text-2 {
+  color: white;
+  text-align: left;
+  width: 120px;
+  position: relative;
+  left:90px;
+  top: 0px;
+}
+
+.info-label {
+  font-size: 0.75rem;
+}
+
+.info-value {
+  font-weight: bold;
+  font-size: 1.2rem; /* Minska blockens värden */
+  height: 30px;
+  width: 80px;
+}
+
+.icon-block {
+  margin-right: 10px;
+  align-items:start;
+  display: flex;
+}
+
+.icon {
+  width: 20px; /* Justera storleken på ikonerna */
+}
+
+.button-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.action-button {
+  background-color: rgb(223, 219, 219);
+  border: none;
+  color: #e42313;
+  padding: 0px;
+  font-size: 0.8rem; /* Minska textstorleken */
+  font-weight: bold;
+  border-radius: 5px;
+  width: 60%;
+  position: relative;
+  top: 13px;
+}
+
+.secondary-action-button {
+  background-color: rgb(223, 219, 219);
+  color: #e42313;
+  font-weight: normal;
+  border-radius: 5px;
+  padding: 0px;
+  font-size: 0.8rem; /* Minska textstorleken */
+  width: 80%;
+  border: none;
+  position: relative;
+  top: 10px;
+}
+.secondary-action-button:hover {
+  background-color: #e42313;
+  color: white;
+}
+
+.action-button:hover {
+  background-color: #d41e10;
+  color: white;
+}
+.button-container {
+  margin: 0px;
+  background-color: white;
+  padding: 0px;
+  width: 200px;
+  height: 60px;
+  border-radius: 10px;
+  position: relative;
+  left: 40px;
+  top: -15px;
+  z-index: 2;
+}
+
+
+
